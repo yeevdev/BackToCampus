@@ -16,14 +16,14 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
         _handleTransform = handle.transform; // caching
     }
 
-    private Vector2 getHandleOffset(Vector2 screenCoords)
+    private Vector2 GetHandleOffset(Vector2 screenCoords)
     {
         Vector2 worldCoords = cam.ScreenToWorldPoint(screenCoords, Camera.MonoOrStereoscopicEye.Mono); 
         return worldCoords - new Vector2(_transform.position.x, _transform.position.y);
     }
 
 
-    public Vector2 getInputVector()
+    public Vector2 GetInputVector()
     {
         return inputVector;
     }
@@ -39,7 +39,7 @@ public class Joystick : MonoBehaviour, IPointerDownHandler, IDragHandler, IPoint
  
     public void OnDrag(PointerEventData data)
     {
-        Vector2 handleOffset = Vector2.ClampMagnitude(getHandleOffset(data.position), maxRadius);
+        Vector2 handleOffset = Vector2.ClampMagnitude(GetHandleOffset(data.position), maxRadius);
         _handleTransform.localPosition = handleOffset;
         inputVector = handleOffset / maxRadius; // inputVector의 크기를 0~1로 조정
     }

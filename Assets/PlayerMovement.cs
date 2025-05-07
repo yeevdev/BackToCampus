@@ -17,7 +17,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
-        Vector3 velocity = joystick.getInputVector() * speedCoef; // 조이스틱 조작에 따른 플레이어 속도
+        Vector3 velocity = joystick.GetInputVector() * speedCoef; // 조이스틱 조작에 따른 플레이어 속도
 
         _transform.position += velocity;
 
