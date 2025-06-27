@@ -11,6 +11,14 @@ public class NPC1 : NPC
     protected override void SetSkins(Sprite skin1, Sprite skin2)
     {    // NPC를 구성하는 두 캐릭터의 스킨을 설정
         spriteRenderer1.sprite = skin1;
-        spriteRenderer2.sprite = skin2;   
+        spriteRenderer2.sprite = skin2;
+    }
+
+    protected override void OnBecameInvisible()
+    {
+        if (this is not NPC1Moveable)
+            poolingManager.pools[1].Release(gameObject);
+        else
+            poolingManager.pools[3].Release(gameObject);
     }
 }

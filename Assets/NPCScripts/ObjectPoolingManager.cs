@@ -8,32 +8,21 @@ public class ObjectPoolingManager : MonoBehaviour
 
     private void Awake()
     {
-        pools = new()
+        pools = new();
+        for (int i = 0; i < 4; i++)
         {
-            {
-                0,
-                new ObjectPool<GameObject>(
-            () => Instantiate(prefabs[0])
-        )
-            },
-            {
-                1,
-                new ObjectPool<GameObject>(
-            () => Instantiate(prefabs[1])
-        )
-            },
-            {
-                2,
-                new ObjectPool<GameObject>(
-            () => Instantiate(prefabs[2])
-        )
-            },
-            {
-                3,
-                new ObjectPool<GameObject>(
-            () => Instantiate(prefabs[3])
-        )
-            }
-        };
+            int tempIndex = i; 
+            pools[i] = new ObjectPool<GameObject>(
+                    () => Instantiate(prefabs[tempIndex]),
+                    /* tempIndex로 i값을 복사 후 전달해야 이 delegate에
+                    reference가 아니라 copy로 전달됨 */
+                    (npc) => npc.SetActive(true),
+                    (npc) => npc.SetActive(false),
+                    (npc) => Destroy(npc),
+                    true,
+                    2,
+                    4
+                );
+        }
     }
 }

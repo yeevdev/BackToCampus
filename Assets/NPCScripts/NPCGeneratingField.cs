@@ -29,11 +29,11 @@ public class NPCGeneratingField : MonoBehaviour
             NPC newNPC = poolingManager.pools[type].Get().GetComponent<NPC>();
             if (type % 2 == 0) // NPC0과 NPC0Moveable
             {
-                newNPC.Init(coords[i], gameMap, skins[Random.Range(0, skins.Count)]);
+                newNPC.Init(coords[i], gameMap, poolingManager, skins[Random.Range(0, skins.Count)]);
             }
             else if (type % 2 == 1) // NPC1과 NPC1Moveable
             {
-                newNPC.Init(coords[i], gameMap, skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
+                newNPC.Init(coords[i], gameMap, poolingManager, skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
             }
         }
     }
