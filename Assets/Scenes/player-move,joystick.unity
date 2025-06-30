@@ -151,8 +151,8 @@ MonoBehaviour:
   prefabs:
   - {fileID: 1352130843898023168, guid: 3633371e248b7ff4a82a98a0596b3c4c, type: 3}
   - {fileID: 1887087276842696485, guid: a6f43f2a4decc384d81c06a5ca4dcb6c, type: 3}
-  - {fileID: 1352130843898023168, guid: 3633371e248b7ff4a82a98a0596b3c4c, type: 3}
-  - {fileID: 1887087276842696485, guid: a6f43f2a4decc384d81c06a5ca4dcb6c, type: 3}
+  - {fileID: 4542568480698194552, guid: f064681936d4d00498a26b5fd729b5cd, type: 3}
+  - {fileID: 1466353339728200837, guid: d7fc4ce6fe896ff4fa45786c8bed96e0, type: 3}
 --- !u!4 &67051351
 Transform:
   m_ObjectHideFlags: 0
@@ -200,8 +200,8 @@ MonoBehaviour:
   mainCamera: {fileID: 433741991}
   gameMap: {fileID: 1362859693}
   skins:
-  - {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
-  - {fileID: 10913, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 4873719120060711836, guid: 228bd03b8fb365b4c8fe6fb4052a861f, type: 3}
+  - {fileID: -6218405372844015081, guid: ecb4d553069c5ac40b05324dd18ffc98, type: 3}
   poolingManager: {fileID: 67051350}
 --- !u!4 &206349594
 Transform:
@@ -413,8 +413,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aae5ebb43920a3b40be45e31a6576e60, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speedCoef: 0.25
-  upBound: -1
+  speedCoef: 0.04
+  upBound: -2
   downBound: -4
   horizontalBound: 2
   joystick: {fileID: 599846131}
