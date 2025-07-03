@@ -5,10 +5,10 @@ public class NPC1Moveable : NPC1
     [SerializeField] private float maxStep; // 최대 스텝 수
     [SerializeField] private float maxTime; // 움직이는데 걸리는 시간
     [SerializeField] private int maxInterpolationTime; // 서브스텝 개수; 부드럽게 움직이기 위해 한 스텝의 길이를 몇 개로 쪼갤 것인지
-    private bool isMoving, isInterpolating;
+    [SerializeField] private bool isMoving, isInterpolating;
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
-    private float time, interpolationTime;
+    [SerializeField] private float time, interpolationTime;
     private Vector3 displacement;
 
     private CollisionBox collisionBoxForward = new(-0.5f, 0.5f, -3.5f, 0.5f);

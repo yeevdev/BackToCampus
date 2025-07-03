@@ -5,10 +5,10 @@ public class NPC0Moveable : NPC0
     [SerializeField] private float stepSize; // 한 스텝의 길이
     [SerializeField] private float maxTime; // 움직이는데 걸리는 시간
     [SerializeField] private float maxInterpolationTime; // 부드럽게 움직이는 시간 
-    private bool isMoving, isInterpolating;
+    [SerializeField] private bool isMoving, isInterpolating;
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
-    private float time, interpolationTime;
+    [SerializeField] private float time, interpolationTime;
     private Vector3[] direction = {
         Vector3.up,
         Vector3.right,

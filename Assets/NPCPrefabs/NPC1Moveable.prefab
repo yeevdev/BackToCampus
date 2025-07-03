@@ -88,7 +88,7 @@ MonoBehaviour:
   stepSize: 1
   maxStep: 10
   maxTime: 0
-  maxInterpolationTime: 4
+  maxInterpolationTime: 2
 --- !u!212 &6594333462934510089 stripped
 SpriteRenderer:
   m_CorrespondingSourceObject: {fileID: 6190769631457042857, guid: a6f43f2a4decc384d81c06a5ca4dcb6c, type: 3}
