@@ -598,7 +598,6 @@ MonoBehaviour:
   downBound: -4
   horizontalBound: 2
   mapRenderer: {fileID: 356500505}
-  mapScrollSpeed: 0.1
   joystick: {fileID: 1241127704}
 --- !u!1 &356500503
 GameObject:
@@ -705,8 +704,8 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6.1470003, y: 10.928, z: 0.683}
-  m_ConstrainProportionsScale: 0
+  m_LocalScale: {x: 5.6979, y: 11.9942, z: 5.6979}
+  m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -717,13 +716,12 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 356500503}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7dbfc032dca5f4cd58c68ed45dc201df, type: 3}
+  m_Script: {fileID: 11500000, guid: f425b2309069b4a8fb2fc560085d9f58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scrollSpeed: 1
-  meshRenderer: {fileID: 356500505}
+  pixelsPerUnit: 100
 --- !u!1 &1241127703
 GameObject:
   m_ObjectHideFlags: 0

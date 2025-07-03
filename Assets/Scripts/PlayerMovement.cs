@@ -13,15 +13,17 @@ public class PlayerMovement : MonoBehaviour
     [Header("맵 스크롤 설정")]
     // 맵의 Sprite Renderer 또는 Mesh Renderer를 연결해주세요.
     [SerializeField] private Renderer mapRenderer;
-    // 맵 텍스처가 스크롤될 속도
-    [SerializeField] private float mapScrollSpeed = 0.1f;
+    // 맵 스크롤 속도 변수는 삭제합니다. speedCoef를 기준으로 계산됩니다.
 
     [Header("연결할 오브젝트")]
     [SerializeField] private JoystickController joystick;
 
     private Rigidbody2D rb;
-    private Material mapMaterial; // 맵의 머티리얼을 저장할 변수
+    private Material mapMaterial;
     private Vector2 moveInput;
+
+    // ▼▼▼ 변경/추가된 부분 ▼▼▼
+    private float mapWorldHeight; // 맵의 실제 월드 높이를 저장할 변수
 
     void Start()
     {
@@ -29,11 +31,12 @@ public class PlayerMovement : MonoBehaviour
         rb.gravityScale = 0;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        // mapRenderer에서 머티리얼 인스턴스를 가져옵니다.
-        // .material을 사용해야 원본 에셋이 아닌 개별 인스턴스가 수정됩니다.
         if (mapRenderer != null)
         {
             mapMaterial = mapRenderer.material;
+            // ▼▼▼ 변경/추가된 부분 ▼▼▼
+            // 맵의 실제 월드 유닛 높이를 한번만 계산해서 저장해둡니다.
+            mapWorldHeight = mapRenderer.bounds.size.y;
         }
     }
 
@@ -44,21 +47,24 @@ public class PlayerMovement : MonoBehaviour
 
     void FixedUpdate()
     {
-        // 플레이어 이동 및 위치 제한
         Vector2 newPosition = rb.position + moveInput * speedCoef * Time.fixedDeltaTime;
         newPosition.x = Mathf.Clamp(newPosition.x, -horizontalBound, horizontalBound);
         newPosition.y = Mathf.Clamp(newPosition.y, downBound, upBound);
         rb.MovePosition(newPosition);
 
-        // 🎨 플레이어가 위쪽 경계에 닿았고, 계속 위로 가려고 할 때 맵 오프셋을 조절합니다.
-        if (mapMaterial != null && rb.position.y >= upBound && moveInput.y > 0)
+        // ▼▼▼ 변경/추가된 부분 ▼▼▼
+        // 맵 스크롤 로직 수정
+        if (mapMaterial != null && rb.position.y >= upBound && moveInput.y > 0 && mapWorldHeight > 0)
         {
-            // 현재 오프셋 값을 가져와서 y값만 변경합니다.
-            Vector2 currentOffset = mapMaterial.mainTextureOffset;
-            float scrollAmount = moveInput.y * mapScrollSpeed * Time.fixedDeltaTime;
-            currentOffset.y += scrollAmount;
+            // 1. 플레이어가 이번 프레임에 이동하려던 '월드 거리'를 계산합니다.
+            float worldScrollDistance = moveInput.y * speedCoef * Time.fixedDeltaTime;
 
-            // 변경된 오프셋 값을 다시 머티리얼에 적용합니다.
+            // 2. '월드 거리'를 'UV 오프셋' 값으로 변환합니다. (이동 거리 / 맵 전체 높이)
+            float uvScrollAmount = worldScrollDistance / mapWorldHeight;
+
+            // 3. 변환된 값을 현재 오프셋에 더해줍니다.
+            Vector2 currentOffset = mapMaterial.mainTextureOffset;
+            currentOffset.y += uvScrollAmount;
             mapMaterial.mainTextureOffset = currentOffset;
         }
     }
