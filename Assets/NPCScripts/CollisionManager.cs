@@ -7,22 +7,28 @@ public class CollisionManager : MonoBehaviour
     public void Add(CollisionBox box)
     {
         collisionBoxes.Add(box);
-        // for (int i = 0; i < collisionBoxes.Count; i++)
-        // collisionBoxes[i].Log();
     }
 
     public void Remove(CollisionBox box)
     {
         collisionBoxes.Remove(box);
-        // for (int i = 0; i < collisionBoxes.Count; i++)
-        // collisionBoxes[i].Log();
     }
-    
+
     public bool CheckCollision(CollisionBox box)
-    {
+    {   // box와 다른 모든 CollisionBox에 대해서 충돌하는지 검사 
         bool collision = false;
         for (int i = 0; i < collisionBoxes.Count; i++)
-            collision |= box.DoesCollideWith(collisionBoxes[i]);
+        {
+            if (box == collisionBoxes[i])
+            {
+                continue;
+            }
+            if (box.DoesCollideWith(collisionBoxes[i]))
+            {
+                collision = true;
+                break;
+            }
+        }
         return collision;
     }
 }
