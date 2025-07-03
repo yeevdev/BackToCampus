@@ -4,7 +4,7 @@ public class CollisionManager : MonoBehaviour
 {
     private List<CollisionBox> collisionBoxes = new();
 
-    public bool CollisionCheck(CollisionBox box)
+    public bool CheckCollision(CollisionBox box)
     {
         bool collision = false;
         for (int i = 0; i < collisionBoxes.Count; i++)
