@@ -9,14 +9,23 @@ public class NPC1Moveable : NPC1
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
     private float time, interpolationTime;
-    private int stepCount = 0; // 현재 스텝 수
     private Vector3 displacement;
 
+    private CollisionBox collisionBoxForward = new(-0.5f, 0.5f, -3.5f, 0.5f);
 
       private void OnEnable()
     {   // 풀에서 가져오거나 생성되었을 때 초기화
-        stepCount = 0;
-        InitMovement();
+        if (initalized)
+        {
+            collisionBoxForward.SetBoxPosition(transform.position);
+            collisionManager.Add(collisionBoxForward);
+            InitMovement();
+        }
+    }
+
+    private void OnDisable()
+    {   // 풀에 다시 넣을 때
+        collisionManager.Remove(collisionBoxForward);
     }
 
     public void InitMovement()
@@ -50,15 +59,19 @@ public class NPC1Moveable : NPC1
                 time -= Time.deltaTime;
                 if (time <= 0)
                 {
-                    if (stepCount < maxStep)
-                    {
-                        displacement = stepSize * Vector3.down;
-                        time = maxTime;
+                    displacement = stepSize * Vector3.down;
+
+                    // 이동한 후의 충돌 박스를 설정
+                    collisionBoxForward.ChangeBoxPosition(displacement);
+
+                    // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
+                    if (!collisionManager.CheckCollision(collisionBoxForward))
                         isInterpolating = true;
-                        stepCount++;
-                    }
-                    else InitMovement();
+  
+                    // 시간 초기화
+                    time = maxTime;
                 }
+                else InitMovement();
             }
         }
     }

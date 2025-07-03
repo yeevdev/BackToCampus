@@ -1,5 +1,6 @@
+using UnityEditor.Build;
 using UnityEngine;
-public class CollisionBox : MonoBehaviour
+public class CollisionBox // gameMap이 내려가면서 버그가 발생할 것..................... 
 {
     float left, right, top, bottom;
     float leftPos, rightPos, topPos, bottomPos;
@@ -32,5 +33,10 @@ public class CollisionBox : MonoBehaviour
     public bool DoesCollideWith(CollisionBox box) // 박스가 겹치는가?
     {
         return !((box.rightPos <= leftPos || box.leftPos >= rightPos) && (box.topPos <= bottomPos || box.bottom >= topPos));
+    }
+
+    public void Log()
+    {
+        Debug.Log($"{topPos}, {rightPos}, {bottomPos}, {leftPos}");
     }
 }

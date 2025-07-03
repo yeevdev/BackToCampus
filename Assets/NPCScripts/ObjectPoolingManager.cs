@@ -5,15 +5,23 @@ public class ObjectPoolingManager : MonoBehaviour
 {
     public Dictionary<int, ObjectPool<GameObject>> pools;
     [SerializeField] private GameObject[] prefabs;
+    [SerializeField] private Transform gameMap;
+    [SerializeField] private CollisionManager collisionManager;
+
 
     private void Awake()
     {
         pools = new();
         for (int i = 0; i < 4; i++)
         {
-            int tempIndex = i; 
+            int tempIndex = i;
             pools[i] = new ObjectPool<GameObject>(
-                    () => Instantiate(prefabs[tempIndex]),
+                    () =>
+                    {
+                        GameObject npc = Instantiate(prefabs[tempIndex]);
+                        npc.GetComponent<NPC>().InitInstantiated(gameMap, this, collisionManager);
+                        return npc;
+                    },
                     /* tempIndex로 i값을 복사 후 전달해야 이 delegate에
                     reference가 아니라 copy로 전달됨 */
                     (npc) => npc.SetActive(true),
