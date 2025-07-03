@@ -9,33 +9,37 @@ public class NPC1Moveable : NPC1
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
     [SerializeField] private float time, interpolationTime;
-    private Vector3 displacement;
+    [SerializeField] private Vector2 boxPos;
+    [SerializeField] private Vector3 displacement;
 
     private CollisionBox collisionBoxForward = new(-0.5f, 0.5f, -3.5f, 0.5f);
 
-      private void OnEnable()
-    {   // 풀에서 가져오거나 생성되었을 때 초기화
-        if (initalized)
-        {
-            collisionBoxForward.SetBoxPosition(transform.position);
-            collisionManager.Add(collisionBoxForward);
-            InitMovement();
-        }
+    protected override void InitNPCMoveable() 
+    {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함. 
+        collisionBoxForward.SetBoxPosition(transform.position);
+        collisionManager.Add(collisionBoxForward);
+        InitMovement();
     }
 
     private void OnDisable()
     {   // 풀에 다시 넣을 때
         collisionManager.Remove(collisionBoxForward);
+        collisionManager.Remove(collisionBox);
     }
 
-    public void InitMovement()
+    private void OnBecameVisible()
+    {   // 화면에 보일 때
+        isMoving = true;
+    }
+
+    private void InitMovement()
     {
         isMoving = false;
         time = maxTime;
         InitInterpolation();
     }
 
-    public void InitInterpolation()
+    private void InitInterpolation()
     {
         isInterpolating = false;
         interpolationTime = 0;
@@ -45,14 +49,18 @@ public class NPC1Moveable : NPC1
     {
         if (isMoving)
         {
-            if (isInterpolating)
+            if (isInterpolating) // 보간; 부드럽게 움직이기 위한 코드
             {
                 if (interpolationTime < maxInterpolationTime)
                 {
                     interpolationTime += Time.deltaTime;
                     transform.position += Time.deltaTime / maxInterpolationTime * displacement;
                 }
-                else InitInterpolation();
+                else
+                {
+                    collisionBox.ChangeBoxPosition(displacement); // NPC 자체 충돌 박스를 이동
+                    InitInterpolation();
+                }
             }
             else
             {
@@ -62,22 +70,18 @@ public class NPC1Moveable : NPC1
                     displacement = stepSize * Vector3.down;
 
                     // 이동한 후의 충돌 박스를 설정
-                    collisionBoxForward.ChangeBoxPosition(displacement);
+                    collisionBoxForward.SetBoxPosition(collisionBox.GetBoxPosition() + (Vector2)displacement);
 
                     // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
                     if (!collisionManager.CheckCollision(collisionBoxForward))
+                    {
                         isInterpolating = true;
-  
+                    }
+
                     // 시간 초기화
                     time = maxTime;
                 }
-                else InitMovement();
             }
         }
-    }
-
-    void OnBecameVisible()
-    {
-        isMoving = true;
     }
 }

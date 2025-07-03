@@ -1,9 +1,9 @@
-using UnityEditor.Build;
 using UnityEngine;
-public class CollisionBox // gameMap이 내려가면서 버그가 발생할 것..................... 
+public class CollisionBox // gameMap이 내려가면서 버그가 발생할 수도? 
 {
-    float left, right, top, bottom;
-    float leftPos, rightPos, topPos, bottomPos;
+    Vector2 position;
+    float left, right, bottom, top;
+    float leftPos, rightPos, bottomPos, topPos;
 
     public CollisionBox(float _left, float _right, float _bottom, float _top)
     {
@@ -14,8 +14,14 @@ public class CollisionBox // gameMap이 내려가면서 버그가 발생할 것.
         top = _top;
     }
 
+    public Vector2 GetBoxPosition()
+    {
+        return position;
+    }
+
     public void SetBoxPosition(Vector2 coord) // 박스 위치 설정
     {
+        position = coord;
         leftPos = coord.x + left;
         rightPos = coord.x + right;
         bottomPos = coord.y + bottom;
@@ -24,6 +30,7 @@ public class CollisionBox // gameMap이 내려가면서 버그가 발생할 것.
 
     public void ChangeBoxPosition(Vector2 change) // 박스 위치 이동
     {
+        position += change;
         leftPos += change.x;
         rightPos += change.x;
         bottomPos += change.y;
@@ -32,11 +39,6 @@ public class CollisionBox // gameMap이 내려가면서 버그가 발생할 것.
 
     public bool DoesCollideWith(CollisionBox box) // 박스가 겹치는가?
     {
-        return !((box.rightPos <= leftPos || box.leftPos >= rightPos) && (box.topPos <= bottomPos || box.bottom >= topPos));
-    }
-
-    public void Log()
-    {
-        Debug.Log($"{topPos}, {rightPos}, {bottomPos}, {leftPos}");
+        return !(box.rightPos <= leftPos || box.leftPos >= rightPos || box.topPos <= bottomPos || box.bottomPos >= topPos);
     }
 }

@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.PlayerLoop;
 public class NPC0Moveable : NPC0
 {
     [SerializeField] private float stepSize; // 한 스텝의 길이
@@ -19,21 +18,22 @@ public class NPC0Moveable : NPC0
 
     private CollisionBox collisionBoxForward = new(-0.5f, 0.5f, -0.5f, 0.5f);
 
-    private void OnEnable()
-    {   // 풀에서 가져올 때 초기화
-        if (initalized)
-        {
+    protected override void InitNPCMoveable() 
+    {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함.
         collisionBoxForward.SetBoxPosition(transform.position);
-        // collisionManager.Add(collisionBoxForward);
+        collisionManager.Add(collisionBoxForward);
         InitMovement();
-        }
     }
 
     private void OnDisable()
     {   // 풀에 다시 넣을 때
-        // collisionManager.Remove(collisionBoxForward);
+        collisionManager.Remove(collisionBoxForward);
+        collisionManager.Remove(collisionBox);
     }
-
+    void OnBecameVisible()
+    {   // 화면에 보일 때
+        isMoving = true;
+    }
     public void InitMovement()
     {
         isMoving = false;
@@ -72,20 +72,18 @@ public void InitInterpolation()
                     displacement = stepSize * direction[Random.Range(0, 4)];
 
                     // 이동한 후의 충돌 박스를 설정
-                    collisionBoxForward.ChangeBoxPosition(displacement);
+                    collisionBoxForward.SetBoxPosition(collisionBox.GetBoxPosition() + (Vector2)displacement);
 
                     // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
-                    // if (!collisionManager.CheckCollision(collisionBoxForward))
+                    if (!collisionManager.CheckCollision(collisionBoxForward))
+                    {
                         isInterpolating = true;
-                    
+                    }
+
                     // 시간 초기화
                     time = maxTime;
                 }
             }
         }
-    }
-    void OnBecameVisible()
-    {
-        isMoving = true;
     }
 }
