@@ -3,7 +3,7 @@ public abstract class NPC : MonoBehaviour
 {
     protected ObjectPoolingManager poolingManager;
     protected CollisionManager collisionManager; // NPC 충돌 매니저
-    protected CollisionBox collisionBox = new(-0.5f, 0.5f, -0.5f, 0.5f);
+    protected CollisionBox collisionBox = new(-0.4f, 0.4f, -0.4f, 0.4f);
 
     // NPC 생성시 한 번만 초기화
     public virtual void InitInstantiated(Transform gameMap, ObjectPoolingManager _poolingManager, CollisionManager _collisionManager)

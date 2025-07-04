@@ -11,18 +11,25 @@ public class NPC1Moveable : NPC1
     [SerializeField] private Vector2 boxPos;
     [SerializeField] private Vector3 displacement;
 
-    private CollisionBox collisionBoxForward = new(-0.5f, 0.5f, -3.5f, 0.5f);
+    private CollisionBox collisionBoxForward = new(-0.4f, 0.4f, -0.4f, 0.4f);
+    // NPC1Moveable이 다른 NPC들의 충돌 박스와 충돌하는지 판단할 때 사용하는 충돌 박스
+    private CollisionBox collisionBoxForwardUpTo4Steps = new(-0.4f, 0.4f, -3.6f, -0.4f);
+    // 다른 NPC들이 NPC1Moveable의 충돌 박스와 충돌하는지 판단할 때 사용하는 충돌 박스
+    // 다른 NPC들이 NPC1Moveable 아래로 4칸까지 이동할 수 없게 함 
 
-    protected override void InitNPCMoveable() 
+    protected override void InitNPCMoveable()
     {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함. 
         collisionBoxForward.SetBoxPosition(transform.position);
         collisionManager.Add(collisionBoxForward);
+        collisionBoxForwardUpTo4Steps.SetBoxPosition(transform.position);
+        collisionManager.Add(collisionBoxForwardUpTo4Steps);
         InitMovement();
     }
 
     private void OnDisable()
     {   // 풀에 다시 넣을 때
         collisionManager.Remove(collisionBoxForward);
+        collisionManager.Remove(collisionBoxForwardUpTo4Steps);
         collisionManager.Remove(collisionBox);
     }
 
@@ -57,7 +64,9 @@ public class NPC1Moveable : NPC1
                 }
                 else
                 {
-                    collisionBox.ChangeBoxPosition(displacement); // NPC 자체 충돌 박스를 이동
+                    // NPC 자체 충돌 박스와 앞 4칸 박스를 이동
+                    collisionBox.ChangeBoxPosition(displacement);
+                    collisionBoxForwardUpTo4Steps.ChangeBoxPosition(displacement);
                     InitInterpolation();
                 }
             }
@@ -72,7 +81,7 @@ public class NPC1Moveable : NPC1
                     collisionBoxForward.SetBoxPosition(collisionBox.GetBoxPosition() + (Vector2)displacement);
 
                     // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
-                    if (!collisionManager.CheckCollision(collisionBoxForward))
+                    if (!collisionManager.CheckCollision(collisionBoxForward, collisionBoxForwardUpTo4Steps))
                     {
                         isInterpolating = true;
                     }

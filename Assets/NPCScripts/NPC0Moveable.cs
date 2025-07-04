@@ -16,7 +16,7 @@ public class NPC0Moveable : NPC0
     };
     private Vector3 displacement;
 
-    private CollisionBox collisionBoxForward = new(-0.5f, 0.5f, -0.5f, 0.5f);
+    private CollisionBox collisionBoxForward = new(-0.4f, 0.4f, -0.4f, 0.4f);
 
     protected override void InitNPCMoveable() 
     {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함.

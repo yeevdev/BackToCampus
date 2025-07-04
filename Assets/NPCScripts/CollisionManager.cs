@@ -31,4 +31,22 @@ public class CollisionManager : MonoBehaviour
         }
         return collision;
     }
+
+    public bool CheckCollision(CollisionBox box, CollisionBox exception)
+    {   // box가 exception을 제외한 다른 모든 CollisionBox에 대해서 충돌하는지 검사 
+        bool collision = false;
+        for (int i = 0; i < collisionBoxes.Count; i++)
+        {
+            if (box == collisionBoxes[i] || exception == collisionBoxes[i])
+            {
+                continue;
+            }
+            if (box.DoesCollideWith(collisionBoxes[i]))
+            {
+                collision = true;
+                break;
+            }
+        }
+        return collision;
+    }
 }
