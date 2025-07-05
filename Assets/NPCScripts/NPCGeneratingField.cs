@@ -5,13 +5,45 @@ public class NPCGeneratingField : MonoBehaviour
     [SerializeField] private ObjectPoolingManager poolingManager;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private List<Sprite> skins;
-    [SerializeField] private float frequencyNPC1Moveable; // 각 열마다 NPC1Moveable이 생성될 확률
+    [SerializeField] private float NPC0Freq; // NPC0이 생성될 확률
+    [SerializeField] private float NPC1Freq; // NPC1이 생성될 확률
+    [SerializeField] private float NPC0MoveableFreq; // NPC0Moveable이 생성될 확률
+    [SerializeField] private float NPC1MoveableInColumnFreq; // 각 열마다 NPC1Moveable이 생성될 확률
+    [SerializeField] private float NPC0MoveableFreq2; // 각 열마다 NPC1Moveable이 생성될 확률
+    [SerializeField] private float NPC1MoveableFreq2; // 각 열마다 NPC1Moveable이 생성될 확률
+    private float allFreq;
+    private float allFreq2;
 
     // NPC type
     // 0: NPC0
     // 1: NPC1
     // 2: NPC0Moveable
     // 3: NPC1Moveable
+
+    private void Awake()
+    {
+        if (NPC0Freq < 0 || NPC1Freq < 0 || NPC0MoveableFreq < 0
+        || NPC1MoveableInColumnFreq < 0 || NPC0MoveableFreq2 < 0 || NPC1MoveableFreq2 < 0)
+        {
+            Debug.LogAssertion("어떤 Freq 변수도 음수가 될 수 없습니다.");
+        }
+        else if (NPC1MoveableInColumnFreq > 1)
+        {
+            Debug.LogAssertion("NPC1MoveableInColumnFreq는 0 이상 1 이하의 수입니다.");
+        }
+
+        allFreq = NPC0Freq + NPC1Freq + NPC0MoveableFreq;
+        allFreq2 = NPC0MoveableFreq2 + NPC1MoveableFreq2;
+
+        if (allFreq == 0)
+        {
+            Debug.LogAssertion("NPC0Freq, NPC1Freq, NPC0MoveableFreq의 합은 0일 수 없습니다.");
+        }
+        if (allFreq2 == 0)
+        {
+            Debug.LogAssertion("NPC0MoveableFreq2와 NPC1MoveableFreq2의 합은 0일 수 없습니다.");
+        }
+    }
 
     private void FixedUpdate()
     {
@@ -20,7 +52,7 @@ public class NPCGeneratingField : MonoBehaviour
 
     private void SpawnNPCs(int numberOfNPCs)
     {
-        // 열 별로 정리된 모든 좌표를 GetRandomCoords()에서 먼저 가져옴
+        // 열별로 정리된 모든 좌표를 GetRandomCoords()에서 먼저 가져옴
         // 각 열은 일정 확률로 수직이동형 NPC 생성
         // 수직이동형 NPC가 생성되는 열에서는 수직이동형 NPC와 랜덤추적형 NPC만 생성
         // 수직이동형 NPC가 생성되지 않는 열에서는 나머지 NPC로 채워 넣음
@@ -35,7 +67,7 @@ public class NPCGeneratingField : MonoBehaviour
             }
 
             // 랜덤 결과 NPC1Moveable을 생성하기로 결정되었다면
-            if (Random.Range(0f, 1f) <= frequencyNPC1Moveable)
+            if (Random.Range(0f, 1f) <= NPC1MoveableInColumnFreq)
             {
                 // 선택된 열의 첫번째 좌표는 NPC1Moveable로 생성
                 poolingManager.pools[3].Get().GetComponent<NPC>()
@@ -45,7 +77,18 @@ public class NPCGeneratingField : MonoBehaviour
                 for (int j = 1; j < coords[i].Count; j++)
                 {
                     // type2(NPC0Moveable)와 type3(NPC1Moveable) 중 랜덤으로 결정
-                    int type = Random.Range(2, 4);
+                    float random = Random.Range(0f, 1f);
+                    int type;
+                    if (random < NPC0MoveableFreq2 / allFreq2)
+                    {
+                        type = 2;
+                    }
+                    else
+                    {
+                        type = 3;
+                    }
+
+                    // NPC 생성 및 초기화
                     NPC npc = poolingManager.pools[type].Get().GetComponent<NPC>();
                     if (type == 2)
                     {
@@ -62,7 +105,22 @@ public class NPCGeneratingField : MonoBehaviour
                 for (int j = 0; j < coords[i].Count; j++)
                 {
                     // type0(NPC0), type1(NPC1), type2(NPC0Moveable) 중 랜덤으로 결정
-                    int type = Random.Range(0, 3);
+                    float random = Random.Range(0f, 1f);
+                    int type;
+                    if (random < NPC0Freq / allFreq)
+                    {
+                        type = 0;
+                    }
+                    else if (random < (NPC0Freq + NPC1Freq) / allFreq)
+                    {
+                        type = 1;
+                    }
+                    else
+                    {
+                        type = 2;
+                    }
+
+                    // NPC 생성 및 초기화
                     NPC npc = poolingManager.pools[type].Get().GetComponent<NPC>();
                     if (type == 0 || type == 2)
                     {
