@@ -171,7 +171,7 @@ public class NPCGeneratingField : MonoBehaviour
             cells.RemoveAt(chosenIndex);
 
             // 정해진 구역이 어느 열인지 계산
-            int chosenColumn = chosenCell / rows;
+            int chosenColumn = chosenCell % columns;
 
             // 선택된 구역을 더 잘게 나누는 subcell을 정함
             int chosenSubcell = Random.Range(0, subrows * subcolumns);
