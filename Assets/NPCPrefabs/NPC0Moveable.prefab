@@ -79,5 +79,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   stepSize: 1
-  maxTime: 3
+  maxTime: 0.5
   maxInterpolationTime: 1
+  isMoving: 0
+  isInterpolating: 0
+  time: 0
+  interpolationTime: 0
