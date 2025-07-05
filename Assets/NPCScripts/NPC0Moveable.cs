@@ -8,12 +8,7 @@ public class NPC0Moveable : NPC0
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
     [SerializeField] private float time, interpolationTime;
-    private Vector3[] direction = {
-        Vector3.up,
-        Vector3.right,
-        Vector3.down,
-        Vector3.left,
-    };
+
     private Vector3 displacement;
 
     private CollisionBox collisionBoxForward = new(-0.4f, 0.4f, -0.4f, 0.4f);
@@ -69,7 +64,8 @@ public void InitInterpolation()
                 time -= Time.deltaTime;
                 if (time <= 0)
                 {
-                    displacement = stepSize * direction[Random.Range(0, 4)];
+                    // 360도 전방향 랜덤 벡터
+                    displacement = stepSize * Random.insideUnitCircle.normalized;
 
                     // 이동한 후의 충돌 박스를 설정
                     collisionBoxForward.SetBoxPosition(collisionBox.GetBoxPosition() + (Vector2)displacement);
