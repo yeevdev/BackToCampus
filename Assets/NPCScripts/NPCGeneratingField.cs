@@ -1,12 +1,17 @@
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 public class NPCGeneratingField : MonoBehaviour
 {
     [SerializeField] private ObjectPoolingManager poolingManager;
     [SerializeField] private Camera mainCamera;
     [SerializeField] private List<Sprite> skins;
+    [SerializeField] private float frequencyNPC1Moveable; // 각 열마다 NPC1Moveable이 생성될 확률
 
+    // NPC type
+    // 0: NPC0
+    // 1: NPC1
+    // 2: NPC0Moveable
+    // 3: NPC1Moveable
 
     private void FixedUpdate()
     {
@@ -15,73 +20,103 @@ public class NPCGeneratingField : MonoBehaviour
 
     private void SpawnNPCs(int numberOfNPCs)
     {
-        Vector2[] coords = GetRandomCoords(5, 3, 2, 2, numberOfNPCs);
+        // 열 별로 정리된 모든 좌표를 GetRandomCoords()에서 먼저 가져옴
+        // 각 열은 일정 확률로 수직이동형 NPC 생성
+        // 수직이동형 NPC가 생성되는 열에서는 수직이동형 NPC와 랜덤추적형 NPC만 생성
+        // 수직이동형 NPC가 생성되지 않는 열에서는 나머지 NPC로 채워 넣음
+        List<Vector2>[] coords = GetRandomCoords(5, 3, 2, 2, numberOfNPCs);
 
-        // 4종류의 NPC Prefab 중 랜덤으로 선택
-        List<int> types = new();
-        for (int i = 0; i < numberOfNPCs; i++)
+        // 큰 구역의 열을 이터레이팅
+        for (int i = 0; i < coords.Length; i++)
         {
-             
-            types.Add(Random.Range(0, 4));
-        }
-
-        for (int i = 0; i < numberOfNPCs; i++)
-        {
-            
-            int type = Random.Range(0, 4);
-
-            // if (/*same column exists*/) {
-            //     if (/*type is 0*/) {
-            //         /*the other cell in the same column should be type 0, 1, or 2 */
-            //         // type 3 is forbidden
-            //     }
-            //     else if (/*type is 1*/) {
-            //         /*the other cell in the same column should be type 0, 1, 2 or 3*/
-            //         // nothing is forbidden
-            //     }
-            //     else if (/*type is 2*/) {
-            //         /*the other cell in the same column should be type 0, 1, or 2 */
-            //         // type 3 is forbidden
-            //     }
-            //     else if (/*type is 3*/) {
-            //         /*the other cell in the same column should only be type 1 or 3*/
-            //         // type 0 or 2 is forbidden
-            //     }
-            // }
-
-            NPC newNPC = poolingManager.pools[type].Get().GetComponent<NPC>();
-            if (type % 2 == 0) // NPC0과 NPC0Moveable
+            if (coords[i].Count == 0)
             {
-                newNPC.Init(coords[i], skins[Random.Range(0, skins.Count)]);
+                continue;
             }
-            else if (type % 2 == 1) // NPC1과 NPC1Moveable
+
+            // 랜덤 결과 NPC1Moveable을 생성하기로 결정되었다면
+            if (Random.Range(0f, 1f) <= frequencyNPC1Moveable)
             {
-                newNPC.Init(coords[i], skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
+                // 선택된 열의 첫번째 좌표는 NPC1Moveable로 생성
+                poolingManager.pools[3].Get().GetComponent<NPC>()
+                .Init(coords[i][0], skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
+
+                // 선택된 열의 다른 좌표는 NPC0Moveable 또는 NPC1Moveable 중 하나로 랜덤으로 생성
+                for (int j = 1; j < coords[i].Count; j++)
+                {
+                    // type2(NPC0Moveable)와 type3(NPC1Moveable) 중 랜덤으로 결정
+                    int type = Random.Range(2, 4);
+                    NPC npc = poolingManager.pools[type].Get().GetComponent<NPC>();
+                    if (type == 2)
+                    {
+                        npc.Init(coords[i][j], skins[Random.Range(0, skins.Count)]);
+                    }
+                    else if (type == 3)
+                    {
+                        npc.Init(coords[i][j], skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
+                    }
+                }
+            }
+            else // 랜덤 결과 NPC1Moveable을 생성하지 않기로 결정되었다면
+            {
+                for (int j = 0; j < coords[i].Count; j++)
+                {
+                    // type0(NPC0), type1(NPC1), type2(NPC0Moveable) 중 랜덤으로 결정
+                    int type = Random.Range(0, 3);
+                    NPC npc = poolingManager.pools[type].Get().GetComponent<NPC>();
+                    if (type == 0 || type == 2)
+                    {
+                        npc.Init(coords[i][j], skins[Random.Range(0, skins.Count)]);
+                    }
+                    else if (type == 1)
+                    {
+                        npc.Init(coords[i][j], skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
+                    }
+                }
             }
         }
     }
     
-    private Vector2[] GetRandomCoords(int rows, int columns, int subrows, int subcolumns, int numberOfNPCs)
+    private List<Vector2>[] GetRandomCoords(int rows, int columns, int subrows, int subcolumns, int numberOfNPCs)
     {
+        List<Vector2>[] result = new List<Vector2>[columns];
+        for (int i = 0; i < result.Length; i++)
+        {
+            result[i] = new();
+        }
+        // NPC 생성 좌표를 큰 구역의 각 열마다 분리해 저장
+        // 열이 3개이고 생성하는 NPC가 4명일 때 result의 임의의 구조 예시)
+        // [
+        //  [(,),(,),(,)],  // 첫번째 열
+        //  [],             // 두번째 열
+        //  [(,)]           // 세번째 열
+        // ]
+
+        // 한 cell의 너비와 높이
         float cellWidth = Screen.width / columns;
         float cellHeight = Screen.height / rows;
+        // 한 subcell의 너비와 높이
+        float subcellWidth = cellWidth / subcolumns;
+        float subcellHeight = cellHeight / subrows;
 
         List<int> cells = new();
-        Vector2[] positions = new Vector2[numberOfNPCs];
-
-        for (int i = 0; i < rows * columns; i++) cells.Add(i);
+        for (int i = 0; i < rows * columns; i++)
+        {
+            cells.Add(i);
+        }
 
         for (int i = 0; i < numberOfNPCs; i++)
         {
             // 선택되지 않은 큰 구역 중 한 곳을 정함
             int chosenIndex = Random.Range(0, cells.Count);
             int chosenCell = cells[chosenIndex];
+            cells.RemoveAt(chosenIndex);
+
+            // 정해진 구역이 어느 열인지 계산
+            int chosenColumn = chosenCell / rows;
 
             // 선택된 구역을 더 잘게 나누는 subcell을 정함
-            int chosenSubcell = Random.Range(0, subrows * subcolumns - 1);
-            // 한 subcell의 너비와 높이
-            float subcellWidth = cellWidth / subcolumns;
-            float subcellHeight = cellHeight / subrows;
+            int chosenSubcell = Random.Range(0, subrows * subcolumns);
 
             // NPC가 생성될 좌표
             Vector2 position = new(
@@ -89,14 +124,9 @@ public class NPCGeneratingField : MonoBehaviour
                 Screen.height + cellHeight * (chosenCell / columns) + subcellHeight * (chosenSubcell / subcolumns + .5f)
             );
 
-            positions[i] = mainCamera.ScreenToWorldPoint(position);
-
-            // 선택된 큰 구역의 숫자를 제거
-            cells.RemoveAt(chosenIndex);
+            // 좌표 저장
+            result[chosenColumn].Add(mainCamera.ScreenToWorldPoint(position));
         }
-
-        var sorted = from coord in positions orderby coord.x select coord;
-        positions = sorted.ToArray();
-        return positions;
+        return result;
     }
 }

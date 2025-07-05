@@ -9,6 +9,12 @@ public class ObjectPoolingManager : MonoBehaviour
     [SerializeField] private CollisionManager collisionManager;
 
 
+    // NPC type
+    // 0: NPC0
+    // 1: NPC1
+    // 2: NPC0Moveable
+    // 3: NPC1Moveable
+    
     private void Awake()
     {
         pools = new();
