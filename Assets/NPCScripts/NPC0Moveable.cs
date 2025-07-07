@@ -17,9 +17,9 @@ public class NPC0Moveable : NPC0
     [SerializeField] private float minDistance;
 
     protected override void InitNPCMoveable()
-    {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함.
-        InitMovement();
+    {   // 오브젝트 풀에서 가져올 때 마다, Init 후에 실행. 
         playerTransform = GameObject.FindGameObjectWithTag("Player").transform;   
+        InitMovement();
     }
 
     void OnBecameVisible()
@@ -83,20 +83,21 @@ public class NPC0Moveable : NPC0
                     // Forward충돌박스 안에 있지 않을 때에는 Forward충돌박스와 충돌한다.
 
                     // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
-
+                    Vector2 forwardPos = transform.position + displacement;
+                    Vector2 colliderSize = boxCollider.size * transform.localScale;
                     // 현재 NPC1Moveable의 forward충돌박스 속에 있는데,
-                    if (Physics2D.OverlapBox(transform.position, boxCollider.size, 0f, forwardBoxes) != null)
+                    if (Physics2D.OverlapBox(transform.position, colliderSize, 0f, forwardBoxes) != null)
                     {// 이동한 후의 충돌 박스가 self충돌박스 또는 boundary충돌박스와 겹치지 않을 때
-                        if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null
-                        && Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, boundaryBoxes) == null)
+                        if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null
+                        && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, boundaryBoxes) == null)
                         {
                             isInterpolating = true;
                         }
                     }
                     // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 playerBox를 제외한 어떤 충돌박스와도 겹치지 않을 때
-                    else if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null
-                    && Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, forwardBoxes) == null
-                    && Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, boundaryBoxes) == null)
+                    else if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null
+                    && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null
+                    && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, boundaryBoxes) == null)
                     {
                         isInterpolating = true;
                     }

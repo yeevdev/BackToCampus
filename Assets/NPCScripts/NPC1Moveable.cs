@@ -13,7 +13,7 @@ public class NPC1Moveable : NPC1
     [SerializeField] private LayerMask selfBoxes;
 
     protected override void InitNPCMoveable()
-    {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함. 
+    {   // 오브젝트 풀에서 가져올 때 마다, Init 후에 실행. 
         InitMovement();
     }
 
@@ -48,7 +48,6 @@ public class NPC1Moveable : NPC1
                 }
                 else
                 {
-                    // NPC 자체 충돌 박스와 앞 4칸 박스를 이동
                     InitInterpolation();
                 }
             }
@@ -59,17 +58,20 @@ public class NPC1Moveable : NPC1
                 {
                     displacement = stepSize * Vector3.down;
 
+                    Vector2 forwardPos = transform.position + displacement;
+                    Vector2 colliderSize = boxCollider.size * transform.localScale;
+
                     // 현재 NPC1Moveable의 forward충돌박스 속에 있는데,
-                    if (Physics2D.OverlapBox(transform.position, boxCollider.size, 0f, forwardBoxes) != null)
+                    if (Physics2D.OverlapBox(transform.position, colliderSize, 0f, forwardBoxes) != null)
                     {// 이동한 후의 충돌 박스가 self충돌박스와 겹치지 않을 때
-                        if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null)
+                        if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null)
                         {
                             isInterpolating = true;
                         }
                     }
                     // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 playerBox를 제외한 어떤 충돌박스와도 겹치지 않을 때
-                    else if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null
-                    && Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, forwardBoxes) == null)
+                    else if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null
+                    && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null)
                     {
                         isInterpolating = true;
                     }
