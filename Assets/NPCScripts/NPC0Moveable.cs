@@ -144,7 +144,7 @@ public class NPC0Moveable : NPC0
         Gizmos.color = Color.green; // 플레이어 감지 원 색상
 
         // 플레이어가 가까이 있는지 검사하는 원
-        Gizmos.DrawWireSphere(transform.position, detector.radius * transform.localScale.x);
+        Gizmos.DrawWireSphere(transform.position, 0.5f * transform.localScale.x);
 
     }
 }
