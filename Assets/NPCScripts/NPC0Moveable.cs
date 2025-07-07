@@ -12,6 +12,7 @@ public class NPC0Moveable : NPC0
     [SerializeField] private LayerMask forwardBoxes;
     [SerializeField] private LayerMask selfBoxes;
     [SerializeField] private LayerMask boundaryBoxes;
+    [SerializeField] private CircleCollider2D detector;
 
     protected override void InitNPCMoveable()
     {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함.
@@ -107,5 +108,11 @@ public class NPC0Moveable : NPC0
             Vector2 nextColliderCenter = (Vector2)transform.position + (Vector2)displacement + boxCollider.offset;
             Gizmos.DrawWireCube(nextColliderCenter, boxCollider.size * transform.localScale);
         }
+
+        Gizmos.color = Color.green; // 플레이어 감지 원 색상
+
+        // 플레이어가 가까이 있는지 검사하는 원
+        Gizmos.DrawWireSphere(transform.position, detector.radius * transform.localScale.x);
+
     }
 }
