@@ -94,6 +94,9 @@ MonoBehaviour:
   selfBoxes:
     serializedVersion: 2
     m_Bits: 256
+  boundaryBoxes:
+    serializedVersion: 2
+    m_Bits: 512
 --- !u!50 &6782057368470911565
 Rigidbody2D:
   serializedVersion: 5

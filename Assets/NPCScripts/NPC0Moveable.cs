@@ -8,15 +8,9 @@ public class NPC0Moveable : NPC0
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
     [SerializeField] private float time, interpolationTime;
-    private BoxCollider2D boxCollider;
     private Vector3 displacement;
     [SerializeField] private LayerMask forwardBoxes;
     [SerializeField] private LayerMask selfBoxes;
-
-    private void Awake()
-    {
-        boxCollider = GetComponent<BoxCollider2D>();
-    }
     [SerializeField] private LayerMask boundaryBoxes;
 
     protected override void InitNPCMoveable()
@@ -92,6 +86,19 @@ public class NPC0Moveable : NPC0
                     time = maxTime;
                 }
             }
+        }
+    }
+    void OnDrawGizmos()
+    {
+        // 스크립트가 활성화되어 있고 BoxCollider2D가 할당되어 있을 때만 그림
+        if (boxCollider == null) return;
+
+        // 이동할 목적지에서 검사하는 박스
+        if (displacement != Vector3.zero) // displacement가 계산된 후에만 그리기
+        {
+            Gizmos.color = Color.red; // 목적지 박스 색상
+            Vector2 nextColliderCenter = (Vector2)transform.position + (Vector2)displacement + boxCollider.offset;
+            Gizmos.DrawWireCube(nextColliderCenter, boxCollider.size * 3.5f);
         }
     }
 }
