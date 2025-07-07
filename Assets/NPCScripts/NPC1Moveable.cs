@@ -3,7 +3,7 @@ public class NPC1Moveable : NPC1
 {
     [SerializeField] private float stepSize; // 한 스텝의 길이
     [SerializeField] private float maxTime; // 움직이는데 걸리는 시간
-    [SerializeField] private int maxInterpolationTime; // 서브스텝 개수; 부드럽게 움직이기 위해 한 스텝의 길이를 몇 개로 쪼갤 것인지
+    [SerializeField] private float maxInterpolationTime;  // 부드럽게 움직이는 시간 
     [SerializeField] private bool isMoving, isInterpolating;
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
