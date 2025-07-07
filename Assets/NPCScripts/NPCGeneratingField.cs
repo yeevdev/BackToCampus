@@ -45,7 +45,7 @@ public class NPCGeneratingField : MonoBehaviour
         }
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
         if (Input.GetKeyDown(KeyCode.G)) SpawnNPCs(4);
     }
