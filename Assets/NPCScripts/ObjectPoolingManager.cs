@@ -6,7 +6,6 @@ public class ObjectPoolingManager : MonoBehaviour
     public Dictionary<int, ObjectPool<GameObject>> pools;
     [SerializeField] private GameObject[] prefabs;
     [SerializeField] private Transform gameMap;
-    [SerializeField] private CollisionManager collisionManager;
 
 
     // NPC type
@@ -25,7 +24,7 @@ public class ObjectPoolingManager : MonoBehaviour
                     () =>
                     {
                         GameObject npc = Instantiate(prefabs[tempIndex]);
-                        npc.GetComponent<NPC>().InitInstantiated(gameMap, this, collisionManager);
+                        npc.GetComponent<NPC>().InitInstantiated(gameMap, this);
                         return npc;
                     },
                     /* tempIndex로 i값을 복사 후 전달해야 이 delegate에

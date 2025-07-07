@@ -8,23 +8,21 @@ public class NPC0Moveable : NPC0
     // isMoving: 이동하는 전체 과정 중 true
     // isInterpolating: 한 칸 이동하는 동안 true
     [SerializeField] private float time, interpolationTime;
-
+    private BoxCollider2D boxCollider;
     private Vector3 displacement;
+    [SerializeField] private LayerMask forwardBoxes;
+    [SerializeField] private LayerMask selfBoxes;
 
-    private CollisionBox collisionBoxForward = new(-0.4f, 0.4f, -0.4f, 0.4f);
+    private void Awake()
+    {
+        boxCollider = GetComponent<BoxCollider2D>();
+    }
 
-    protected override void InitNPCMoveable() 
+    protected override void InitNPCMoveable()
     {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함.
-        collisionBoxForward.SetBoxPosition(transform.position);
-        collisionManager.Add(collisionBoxForward);
         InitMovement();
     }
 
-    private void OnDisable()
-    {   // 풀에 다시 넣을 때
-        collisionManager.Remove(collisionBoxForward);
-        collisionManager.Remove(collisionBox);
-    }
     void OnBecameVisible()
     {   // 화면에 보일 때
         isMoving = true;
@@ -53,9 +51,8 @@ public void InitInterpolation()
                     interpolationTime += Time.deltaTime;
                     transform.position += Time.deltaTime / maxInterpolationTime * displacement;
                 }
-                else
+                else  
                 {
-                    collisionBox.ChangeBoxPosition(displacement); // NPC 자체 충돌 박스를 이동
                     InitInterpolation();
                 }
             }
@@ -67,11 +64,24 @@ public void InitInterpolation()
                     // 360도 전방향 랜덤 벡터
                     displacement = stepSize * Random.insideUnitCircle.normalized;
 
-                    // 이동한 후의 충돌 박스를 설정
-                    collisionBoxForward.SetBoxPosition(collisionBox.GetBoxPosition() + (Vector2)displacement);
+                    // NPC?Moveable은 어떤 충돌박스 내에 이미 있으면 밖으로 탈출하도록 움직일 수 있어야 하므로 Forward충돌박스와는 충돌하지 않고,
+                    // NPC?Moveable이 어떠한 충돌박스에도 겹치지 않으면 Forward충돌박스와 충돌하여야 한다.
+                    // NPC0Moveable은 모든 충돌박스와 충돌하되,
+                    // Forward충돌박스 안에 있을 때에는 Forward충돌박스와 충돌하지 않는다.
+                    // Forward충돌박스 안에 있지 않을 때에는 Forward충돌박스와 충돌한다.
 
                     // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
-                    if (!collisionManager.CheckCollision(collisionBoxForward))
+
+                    // 현재 NPC1Moveable의 forward충돌박스 속에 있는데,
+                    if (Physics2D.OverlapBox(transform.position, boxCollider.size, 0f, forwardBoxes) != null)
+                    {// 이동한 후의 충돌 박스가 self충돌박스와 겹치지 않을 때
+                        if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null)
+                        {
+                            isInterpolating = true;
+                        }
+                    }
+                    // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 어떤 충돌박스와도 겹치지 않을 때
+                    else if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f) == null)
                     {
                         isInterpolating = true;
                     }

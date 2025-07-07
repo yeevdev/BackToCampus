@@ -9,6 +9,8 @@ public class NPC0 : NPC
     }
     protected override void SetSkins(Sprite skin)
     {   // NPC의 스킨 설정
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>();
         spriteRenderer.sprite = skin;
     }
     protected override void SetSkins(Sprite skin1, Sprite skin2)
