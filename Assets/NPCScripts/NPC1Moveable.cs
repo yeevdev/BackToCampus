@@ -67,8 +67,9 @@ public class NPC1Moveable : NPC1
                             isInterpolating = true;
                         }
                     }
-                    // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 어떤 충돌박스와도 겹치지 않을 때
-                    else if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f) == null)
+                    // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 playerBox를 제외한 어떤 충돌박스와도 겹치지 않을 때
+                    else if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null
+                    && Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, forwardBoxes) == null)
                     {
                         isInterpolating = true;
                     }
