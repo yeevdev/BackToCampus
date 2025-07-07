@@ -35,7 +35,7 @@ public class NPC1Moveable : NPC1
         interpolationTime = 0;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (isMoving)
         {
@@ -43,8 +43,8 @@ public class NPC1Moveable : NPC1
             {
                 if (interpolationTime < maxInterpolationTime)
                 {
-                    interpolationTime += Time.deltaTime;
-                    transform.position += Time.deltaTime / maxInterpolationTime * displacement;
+                    interpolationTime += Time.fixedDeltaTime;
+                    transform.position += Time.fixedDeltaTime / maxInterpolationTime * displacement;
                 }
                 else
                 {
@@ -53,7 +53,7 @@ public class NPC1Moveable : NPC1
             }
             else
             {
-                time -= Time.deltaTime;
+                time -= Time.fixedDeltaTime;
                 if (time <= 0)
                 {
                     // 아래를 향하는 벡터

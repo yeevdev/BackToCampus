@@ -40,7 +40,7 @@ public class NPC0Moveable : NPC0
         interpolationTime = 0;
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (isMoving)
         {
@@ -48,8 +48,8 @@ public class NPC0Moveable : NPC0
             {
                 if (interpolationTime < maxInterpolationTime)
                 {
-                    interpolationTime += Time.deltaTime;
-                    transform.position += Time.deltaTime / maxInterpolationTime * displacement;
+                    interpolationTime += Time.fixedDeltaTime;
+                    transform.position += Time.fixedDeltaTime / maxInterpolationTime * displacement;
                 }
                 else
                 {
@@ -58,7 +58,7 @@ public class NPC0Moveable : NPC0
             }
             else
             {
-                time -= Time.deltaTime;
+                time -= Time.fixedDeltaTime;
                 if (time <= 0)
                 {
                     if (isChasing) // 플레이어를 쫓음
