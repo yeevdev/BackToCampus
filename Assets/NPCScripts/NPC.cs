@@ -43,6 +43,6 @@ public abstract class NPC : MonoBehaviour
 
         // 현재 위치에서 검사하는 박스
         Vector2 currentColliderCenter = (Vector2)transform.position + boxCollider.offset;
-        Gizmos.DrawWireCube(currentColliderCenter, boxCollider.size * 3.5f);
+        Gizmos.DrawWireCube(currentColliderCenter, boxCollider.size * transform.localScale);
     }
 }

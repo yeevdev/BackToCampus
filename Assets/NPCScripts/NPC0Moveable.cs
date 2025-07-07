@@ -93,12 +93,18 @@ public class NPC0Moveable : NPC0
         // 스크립트가 활성화되어 있고 BoxCollider2D가 할당되어 있을 때만 그림
         if (boxCollider == null) return;
 
+        Gizmos.color = Color.yellow; // 검사하는 박스 색상
+
+        // 현재 위치에서 검사하는 박스
+        Vector2 currentColliderCenter = (Vector2)transform.position + boxCollider.offset;
+        Gizmos.DrawWireCube(currentColliderCenter, boxCollider.size * transform.localScale);
+
         // 이동할 목적지에서 검사하는 박스
         if (displacement != Vector3.zero) // displacement가 계산된 후에만 그리기
         {
             Gizmos.color = Color.red; // 목적지 박스 색상
             Vector2 nextColliderCenter = (Vector2)transform.position + (Vector2)displacement + boxCollider.offset;
-            Gizmos.DrawWireCube(nextColliderCenter, boxCollider.size * 3.5f);
+            Gizmos.DrawWireCube(nextColliderCenter, boxCollider.size * transform.localScale);
         }
     }
 }
