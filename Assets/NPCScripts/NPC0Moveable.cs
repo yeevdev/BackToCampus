@@ -17,6 +17,7 @@ public class NPC0Moveable : NPC0
     {
         boxCollider = GetComponent<BoxCollider2D>();
     }
+    [SerializeField] private LayerMask boundaryBoxes;
 
     protected override void InitNPCMoveable()
     {   // 오브젝트 풀에서 가져올 때 마다 실행해야 함. 그런데, Init 후에 실행되어야 함.
@@ -34,7 +35,7 @@ public class NPC0Moveable : NPC0
         InitInterpolation();
     }
 
-public void InitInterpolation()
+    public void InitInterpolation()
     {
         isInterpolating = false;
         interpolationTime = 0;
@@ -51,7 +52,7 @@ public void InitInterpolation()
                     interpolationTime += Time.deltaTime;
                     transform.position += Time.deltaTime / maxInterpolationTime * displacement;
                 }
-                else  
+                else
                 {
                     InitInterpolation();
                 }
@@ -74,8 +75,9 @@ public void InitInterpolation()
 
                     // 현재 NPC1Moveable의 forward충돌박스 속에 있는데,
                     if (Physics2D.OverlapBox(transform.position, boxCollider.size, 0f, forwardBoxes) != null)
-                    {// 이동한 후의 충돌 박스가 self충돌박스와 겹치지 않을 때
-                        if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null)
+                    {// 이동한 후의 충돌 박스가 self충돌박스 또는 boundary충돌박스와 겹치지 않을 때
+                        if (Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, selfBoxes) == null
+                        && Physics2D.OverlapBox(transform.position + displacement, boxCollider.size, 0f, boundaryBoxes) == null)
                         {
                             isInterpolating = true;
                         }
