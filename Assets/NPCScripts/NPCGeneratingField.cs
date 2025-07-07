@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+
 public class NPCGeneratingField : MonoBehaviour
 {
     [SerializeField] private ObjectPoolingManager poolingManager;
@@ -39,6 +40,7 @@ public class NPCGeneratingField : MonoBehaviour
         {
             Debug.LogAssertion("NPC0Freq, NPC1Freq, NPC0MoveableFreq의 합은 0일 수 없습니다.");
         }
+        
         if (allFreq2 == 0)
         {
             Debug.LogAssertion("NPC0MoveableFreq2와 NPC1MoveableFreq2의 합은 0일 수 없습니다.");
@@ -56,6 +58,7 @@ public class NPCGeneratingField : MonoBehaviour
         // 각 열은 일정 확률로 수직이동형 NPC 생성
         // 수직이동형 NPC가 생성되는 열에서는 수직이동형 NPC와 랜덤추적형 NPC만 생성
         // 수직이동형 NPC가 생성되지 않는 열에서는 나머지 NPC로 채워 넣음
+        
         List<Vector2>[] coords = GetRandomCoords(5, 3, 2, 2, numberOfNPCs);
 
         // 큰 구역의 열을 이터레이팅
@@ -70,7 +73,7 @@ public class NPCGeneratingField : MonoBehaviour
             if (Random.Range(0f, 1f) <= NPC1MoveableInColumnFreq)
             {
                 // 선택된 열의 첫번째 좌표는 NPC1Moveable로 생성
-                poolingManager.pools[3].Get().GetComponent<NPC>()
+                poolingManager.Pools[3].Get().GetComponent<NPC>()
                 .Init(coords[i][0], skins[Random.Range(0, skins.Count)], skins[Random.Range(0, skins.Count)]);
 
                 // 선택된 열의 다른 좌표는 NPC0Moveable 또는 NPC1Moveable 중 하나로 랜덤으로 생성
@@ -79,6 +82,7 @@ public class NPCGeneratingField : MonoBehaviour
                     // type2(NPC0Moveable)와 type3(NPC1Moveable) 중 랜덤으로 결정
                     float random = Random.Range(0f, 1f);
                     int type;
+
                     if (random < NPC0MoveableFreq2 / allFreq2)
                     {
                         type = 2;
@@ -89,7 +93,8 @@ public class NPCGeneratingField : MonoBehaviour
                     }
 
                     // NPC 생성 및 초기화
-                    NPC npc = poolingManager.pools[type].Get().GetComponent<NPC>();
+                    NPC npc = poolingManager.Pools[type].Get().GetComponent<NPC>();
+
                     if (type == 2)
                     {
                         npc.Init(coords[i][j], skins[Random.Range(0, skins.Count)]);
@@ -107,6 +112,7 @@ public class NPCGeneratingField : MonoBehaviour
                     // type0(NPC0), type1(NPC1), type2(NPC0Moveable) 중 랜덤으로 결정
                     float random = Random.Range(0f, 1f);
                     int type;
+
                     if (random < NPC0Freq / allFreq)
                     {
                         type = 0;
@@ -121,7 +127,8 @@ public class NPCGeneratingField : MonoBehaviour
                     }
 
                     // NPC 생성 및 초기화
-                    NPC npc = poolingManager.pools[type].Get().GetComponent<NPC>();
+                    NPC npc = poolingManager.Pools[type].Get().GetComponent<NPC>();
+                    
                     if (type == 0 || type == 2)
                     {
                         npc.Init(coords[i][j], skins[Random.Range(0, skins.Count)]);
@@ -134,7 +141,7 @@ public class NPCGeneratingField : MonoBehaviour
             }
         }
     }
-    
+
     private List<Vector2>[] GetRandomCoords(int rows, int columns, int subrows, int subcolumns, int numberOfNPCs)
     {
         List<Vector2>[] result = new List<Vector2>[columns];
@@ -185,6 +192,7 @@ public class NPCGeneratingField : MonoBehaviour
             // 좌표 저장
             result[chosenColumn].Add(mainCamera.ScreenToWorldPoint(position));
         }
+
         return result;
     }
 }

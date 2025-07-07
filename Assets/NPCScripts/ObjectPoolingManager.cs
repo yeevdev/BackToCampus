@@ -3,17 +3,18 @@ using System.Collections.Generic;
 using UnityEngine.Pool;
 public class ObjectPoolingManager : MonoBehaviour
 {
-    public Dictionary<int, ObjectPool<GameObject>> pools;
+    private Dictionary<int, ObjectPool<GameObject>> pools;
     [SerializeField] private GameObject[] prefabs;
     [SerializeField] private Transform gameMap;
-
 
     // NPC type
     // 0: NPC0
     // 1: NPC1
     // 2: NPC0Moveable
     // 3: NPC1Moveable
-    
+
+    public Dictionary<int, ObjectPool<GameObject>> Pools => pools;
+
     private void Awake()
     {
         pools = new();
