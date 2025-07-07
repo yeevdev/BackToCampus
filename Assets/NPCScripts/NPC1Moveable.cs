@@ -15,7 +15,7 @@ public class NPC1Moveable : NPC1
     protected override void InitNPCMoveable()
     {   // 오브젝트 풀에서 가져올 때 마다, Init 후에 실행. 
         InitMovement();
-    }
+    }   
 
     private void OnBecameVisible()
     {   // 화면에 보일 때
@@ -56,24 +56,25 @@ public class NPC1Moveable : NPC1
                 time -= Time.deltaTime;
                 if (time <= 0)
                 {
+                    // 아래를 향하는 벡터
                     displacement = stepSize * Vector3.down;
 
+                    // 이동 판정 시 사용되는 변수들
                     Vector2 forwardPos = transform.position + displacement;
                     Vector2 colliderSize = boxCollider.size * transform.localScale;
+                    ContactFilter2D selfFilter = new();
+                    selfFilter.SetLayerMask(selfBoxes);
+                    Collider2D[] result = new Collider2D[2]; // 다음 줄 OverlapBox(이동한 이후의 Collider)와 충돌하는 Collider가 저장될 배열
+                    int howManyCollisions = Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfFilter, result); // 충돌한 Collider 개수 반환
 
-                    // 현재 NPC1Moveable의 forward충돌박스 속에 있는데,
-                    if (Physics2D.OverlapBox(transform.position, colliderSize, 0f, forwardBoxes) != null)
-                    {// 이동한 후의 충돌 박스가 self충돌박스와 겹치지 않을 때
-                        if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null)
-                        {
-                            isInterpolating = true;
-                        }
-                    }
-                    // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 playerBox를 제외한 어떤 충돌박스와도 겹치지 않을 때
-                    else if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null
-                    && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null)
+                    // 이동이 가능한지 판정
+                    if (howManyCollisions == 0 || (howManyCollisions == 1 && result[0] == boxCollider)) // 이동 시 어느 NPC와도 충돌하지 않거나 자기 자신과만 충돌할 때
                     {
-                        isInterpolating = true;
+                        if (Physics2D.OverlapBox(transform.position, colliderSize, 0f, forwardBoxes) != null // 현재 NPC가 NPC1Moveable의 forward Collider에 겹쳐있거나,
+                        || Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null) // 이동 시 NPC1Moveable의 forward Collider가 충돌하지 않을 때
+                        {
+                            isInterpolating = true; // 이 NPC 이동 시작
+                        }
                     }
 
                     // 시간 초기화

@@ -152,17 +152,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8a6e772355f114041ad442bb1b3b3a8b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stepSize: 1
+  stepSize: 1.1
   maxTime: 0.5
   maxInterpolationTime: 1
   isMoving: 0
   isInterpolating: 0
-  chasing: 0
+  isChasing: 0
   time: 0
   interpolationTime: 0
-  playerBox:
-    serializedVersion: 2
-    m_Bits: 64
   forwardBoxes:
     serializedVersion: 2
     m_Bits: 128

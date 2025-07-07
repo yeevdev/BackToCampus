@@ -61,9 +61,11 @@ public class NPC0Moveable : NPC0
                 time -= Time.deltaTime;
                 if (time <= 0)
                 {
-                    if (isChasing)
+                    if (isChasing) // 플레이어를 쫓음
                     {
+                        // 플레이어를 향하는 벡터
                         displacement = stepSize * (playerTransform.position - transform.position).normalized;
+                        // 플레이어가 충분히 가깝다면 크기가 0인 벡터(멈춤)
                         if (Vector3.Distance(playerTransform.position, transform.position) < minDistance)
                         {
                             displacement = Vector3.zero;
@@ -76,31 +78,28 @@ public class NPC0Moveable : NPC0
 
                     }
 
-                    // NPC?Moveable은 어떤 충돌박스 내에 이미 있으면 밖으로 탈출하도록 움직일 수 있어야 하므로 Forward충돌박스와는 충돌하지 않고,
-                    // NPC?Moveable이 어떠한 충돌박스에도 겹치지 않으면 Forward충돌박스와 충돌하여야 한다.
-                    // NPC0Moveable은 모든 충돌박스와 충돌하되,
-                    // Forward충돌박스 안에 있을 때에는 Forward충돌박스와 충돌하지 않는다.
-                    // Forward충돌박스 안에 있지 않을 때에는 Forward충돌박스와 충돌한다.
-
-                    // 이동한 후의 충돌 박스가 다른 충돌 박스들과 충돌하는지 않으면 움직이기
+                    // 이동 판정 시 사용되는 변수들
+                    Vector2 currentPos = transform.position;
                     Vector2 forwardPos = transform.position + displacement;
                     Vector2 colliderSize = boxCollider.size * transform.localScale;
-                    // 현재 NPC1Moveable의 forward충돌박스 속에 있는데,
-                    if (Physics2D.OverlapBox(transform.position, colliderSize, 0f, forwardBoxes) != null)
-                    {// 이동한 후의 충돌 박스가 self충돌박스 또는 boundary충돌박스와 겹치지 않을 때
-                        if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null
-                        && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, boundaryBoxes) == null)
+                    ContactFilter2D selfFilter = new();
+                    selfFilter.SetLayerMask(selfBoxes);
+                    Collider2D[] result = new Collider2D[2]; // 다음 줄 OverlapBox(이동한 이후의 Collider)와 충돌하는 Collider가 저장될 배열
+                    int howManyCollisions = Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfFilter, result); // 충돌한 Collider 개수 반환
+                
+                    // 이동이 가능한지 판정
+                    if (howManyCollisions == 0 || (howManyCollisions == 1 && result[0] == boxCollider)) // 이동 시 어느 NPC와도 충돌하지 않거나 자기 자신과만 충돌할 때
+                    {
+                        if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, boundaryBoxes) == null) // 이동 시 화면 양 옆과 충돌하지 않을 때
                         {
-                            isInterpolating = true;
+                            if (Physics2D.OverlapBox(currentPos, colliderSize, 0f, forwardBoxes) != null // 현재 NPC가 NPC1Moveable의 forward Collider에 겹쳐있거나,
+                            || Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null) // 이동 시 NPC1Moveable의 forward Collider가 충돌하지 않을 때
+                            {
+                                isInterpolating = true; // 이 NPC 이동 시작
+                            }
                         }
                     }
-                    // 현재 forward충돌박스 밖에 있으며, 이동한 후의 충돌 박스가 playerBox를 제외한 어떤 충돌박스와도 겹치지 않을 때
-                    else if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfBoxes) == null
-                    && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null
-                    && Physics2D.OverlapBox(forwardPos, colliderSize, 0f, boundaryBoxes) == null)
-                    {
-                        isInterpolating = true;
-                    }
+
                     // 시간 초기화
                     time = maxTime;
                 }
