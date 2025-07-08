@@ -49,23 +49,37 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector2 newPosition = rb.position + moveInput * speedCoef * Time.fixedDeltaTime;
         newPosition.x = Mathf.Clamp(newPosition.x, -horizontalBound, horizontalBound);
-        newPosition.y = Mathf.Clamp(newPosition.y, downBound, upBound);
-        rb.MovePosition(newPosition);
+        // Y축 이동은 스크롤 로직과 연관되므로 Clamp를 아래에서 처리합니다.
 
-        // ▼▼▼ 변경/추가된 부분 ▼▼▼
-        // 맵 스크롤 로직 수정
-        if (mapMaterial != null && rb.position.y >= upBound && moveInput.y > 0 && mapWorldHeight > 0)
+        // 맵 스크롤 조건 확인
+        bool isScrolling = rb.position.y >= upBound && moveInput.y > 0;
+
+        if (mapMaterial != null && isScrolling && mapWorldHeight > 0)
         {
-            // 1. 플레이어가 이번 프레임에 이동하려던 '월드 거리'를 계산합니다.
-            float worldScrollDistance = moveInput.y * speedCoef * Time.fixedDeltaTime;
+            // ▼▼▼ 핵심 추가 부분 1 ▼▼▼
+            // 현재 스크롤 속도를 GameManager에 기록합니다.
+            GameManager.currentScrollSpeed = moveInput.y * speedCoef;
 
-            // 2. '월드 거리'를 'UV 오프셋' 값으로 변환합니다. (이동 거리 / 맵 전체 높이)
+            // 플레이어는 더 이상 위로 올라가지 않도록 위치를 고정합니다.
+            newPosition.y = upBound;
+
+            // --- 기존 맵 스크롤링 코드 ---
+            float worldScrollDistance = GameManager.currentScrollSpeed * Time.fixedDeltaTime;
             float uvScrollAmount = worldScrollDistance / mapWorldHeight;
-
-            // 3. 변환된 값을 현재 오프셋에 더해줍니다.
             Vector2 currentOffset = mapMaterial.mainTextureOffset;
             currentOffset.y += uvScrollAmount;
             mapMaterial.mainTextureOffset = currentOffset;
         }
+        else
+        {
+            // ▼▼▼ 핵심 추가 부분 2 ▼▼▼
+            // 스크롤 조건이 아닐 때는 속도를 0으로 설정하여 멈춥니다.
+            GameManager.currentScrollSpeed = 0f;
+            
+            // 플레이어는 아래쪽 경계까지만 자유롭게 움직입니다.
+            newPosition.y = Mathf.Clamp(newPosition.y, downBound, upBound);
+        }
+
+        rb.MovePosition(newPosition);
     }
 }

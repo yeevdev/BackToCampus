@@ -9,7 +9,7 @@ public abstract class NPC : MonoBehaviour
     public virtual void InitInstantiated(Transform gameMap, ObjectPoolingManager _poolingManager) // NPC 생성시 한 번만 초기화
     {
         // NPC들이 gameMap과 같이 움직이도록
-        transform.SetParent(gameMap);
+        //transform.SetParent(gameMap);
         // 풀링 매니저 초기화
         poolingManager = _poolingManager;
         boxCollider = GetComponent<BoxCollider2D>();
@@ -52,5 +52,15 @@ public abstract class NPC : MonoBehaviour
         // 현재 위치에서 검사하는 박스
         Vector2 currentColliderCenter = (Vector2)transform.position + boxCollider.offset;
         Gizmos.DrawWireCube(currentColliderCenter, boxCollider.size * transform.localScale);
+    }
+    public float scrollSpeed = 2f;
+    void FixedUpdate()
+    {
+        // 스크롤 속도가 0보다 클 때만 (즉, 스크롤 중일 때만) 움직입니다.
+        if (GameManager.currentScrollSpeed > 0)
+        {
+            // GameManager로부터 현재 스크롤 속도를 받아와 아래로 이동합니다.
+            transform.Translate(Vector3.down * GameManager.currentScrollSpeed * Time.fixedDeltaTime);
+        }
     }
 }
