@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 2eee1eb6812c441639949ef260ee3a36
+guid: 228bd03b8fb365b4c8fe6fb4052a861f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5589981162680635861
-    second: joystick_bg_0
+      213: 4873719120060711836
+    second: npc_boy_front_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -109,30 +109,17 @@ TextureImporter:
     ignorePlatformSupport: 0
     androidETC2FallbackOverride: 0
     forceMaximumCompressionQuality_BC6H_BC7: 0
-  - serializedVersion: 4
-    buildTarget: iOS
-    maxTextureSize: 2048
-    resizeAlgorithm: 0
-    textureFormat: -1
-    textureCompression: 1
-    compressionQuality: 50
-    crunchedCompression: 0
-    allowsAlphaSplitting: 0
-    overridden: 0
-    ignorePlatformSupport: 0
-    androidETC2FallbackOverride: 0
-    forceMaximumCompressionQuality_BC6H_BC7: 0
   spriteSheet:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: joystick_bg_0
+      name: npc_boy_front_0
       rect:
         serializedVersion: 2
-        x: 0
+        x: 1
         y: 0
-        width: 127
-        height: 126
+        width: 16
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -141,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5d154be104a939d40800000000000000
-      internalID: 5589981162680635861
+      spriteID: c938f36b7bde2a340800000000000000
+      internalID: 4873719120060711836
       vertices: []
       indices: 
       edges: []
@@ -161,7 +148,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      start_button_temp_0: -5985202510816231150
+      npc_boy_front_0: 4873719120060711836
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
