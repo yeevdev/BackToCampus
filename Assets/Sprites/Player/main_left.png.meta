@@ -1,11 +1,10 @@
 fileFormatVersion: 2
-guid: 88f1eea3cab18434c8edcbffecb628af
+guid: 59e837ae217ff4e8e9a941d2b434ed30
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -753389214262618126
-    second: "\u1111\u1173\u11AF\u1105\u1166\u110B\u1175\u110B\u1165 4\u1107\u1161\u11BC\u1112\u1163\u11BC
-      gif_0"
+      213: -3304753156537167964
+    second: Main_left_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -38,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -52,7 +51,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 100
+  spritePixelsToUnits: 10
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -76,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -127,14 +126,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: "\u1111\u1173\u11AF\u1105\u1166\u110B\u1175\u110B\u1165 4\u1107\u1161\u11BC\u1112\u1163\u11BC
-        gif_0"
+      name: Main_left_0
       rect:
         serializedVersion: 2
-        x: 79
+        x: 7
         y: 0
-        width: 142
-        height: 320
+        width: 16
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -143,8 +141,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2f71442508c6b85f0800000000000000
-      internalID: -753389214262618126
+      spriteID: 4af404273882322d0800000000000000
+      internalID: -3304753156537167964
       vertices: []
       indices: 
       edges: []
@@ -163,7 +161,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      "\u1111\u1173\u11AF\u1105\u1166\u110B\u1175\u110B\u1165 4\u1107\u1161\u11BC\u1112\u1163\u11BC gif_0": -753389214262618126
+      Main_left_0: -3304753156537167964
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
