@@ -1,9 +1,6 @@
 using UnityEngine;
-
-/// <summary>
 /// ① SettingBox 크기 자동 조정
 /// ② TitleText(상단) · ResumeButton(하단) 고정 배치
-/// </summary>
 [RequireComponent(typeof(RectTransform))]
 public class SettingAutoSize : MonoBehaviour
 {

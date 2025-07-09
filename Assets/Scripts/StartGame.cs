@@ -10,7 +10,7 @@ public class StartGame : MonoBehaviour
         CleanExtraAudioListeners();
 
         // 2) 새 씬 로드 (Single 모드여서 이전 씬은 언로드됨)
-        SceneManager.LoadScene("GameScene");
+        SceneManager.LoadScene("ExampleScene");
     }
     /// 씬 안에 AudioListener가 2개 이상이면 하나만 남기고 제거
     private void CleanExtraAudioListeners()
