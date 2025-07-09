@@ -66,7 +66,7 @@ public class PlayerMovement : MonoBehaviour
         if (mapMaterial != null && isScrolling && mapWorldHeight > 0)
         {
             // 이 부분은 기존 코드와 동일합니다.
-            // GameManager.currentScrollSpeed = moveInput.y * speedCoef; // GameManager가 있다면 사용
+            GameManager.currentScrollSpeed = moveInput.y * speedCoef; // GameManager가 있다면 사용
             newPosition.y = upBound;
             
             float worldScrollDistance = (moveInput.y * speedCoef) * Time.fixedDeltaTime;
@@ -76,7 +76,7 @@ public class PlayerMovement : MonoBehaviour
         else
         {
             // 이 부분은 기존 코드와 동일합니다.
-            // GameManager.currentScrollSpeed = 0f; // GameManager가 있다면 사용
+            GameManager.currentScrollSpeed = 0f; // GameManager가 있다면 사용
             newPosition.y = Mathf.Clamp(newPosition.y, downBound, upBound);
         }
 
