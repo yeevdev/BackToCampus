@@ -45,8 +45,11 @@ public class NPC0Moveable : NPC0
         interpolationTime = 0;
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        // NPC Moveable도 스크롤에 맞춰 내려가도록
+        base.FixedUpdate();
+        
         if (isMoving)
         {
             if (isInterpolating)
@@ -93,7 +96,7 @@ public class NPC0Moveable : NPC0
                     selfFilter.SetLayerMask(selfBoxes);
                     Collider2D[] result = new Collider2D[2]; // 다음 줄 OverlapBox(이동한 이후의 Collider)와 충돌하는 Collider가 저장될 배열
                     int howManyCollisions = Physics2D.OverlapBox(forwardPos, colliderSize, 0f, selfFilter, result); // 충돌한 Collider 개수 반환
-                
+
                     // 이동이 가능한지 판정
                     // 이동 시 어느 NPC와도 충돌하지 않거나 자기 자신과만 충돌할 때
                     if (howManyCollisions == 0 || (howManyCollisions == 1 && result[0] == boxCollider))
@@ -102,7 +105,7 @@ public class NPC0Moveable : NPC0
                         if (Physics2D.OverlapBox(forwardPos, colliderSize, 0f, boundaryBoxes) == null)
                         {
                             // 현재 NPC가 NPC1Moveable의 forward Collider에 겹쳐있거나,
-                            if (Physics2D.OverlapBox(currentPos, colliderSize, 0f, forwardBoxes) != null 
+                            if (Physics2D.OverlapBox(currentPos, colliderSize, 0f, forwardBoxes) != null
                                 // 이동 시 NPC1Moveable의 forward Collider가 충돌하지 않을 때
                                 || Physics2D.OverlapBox(forwardPos, colliderSize, 0f, forwardBoxes) == null)
                             {

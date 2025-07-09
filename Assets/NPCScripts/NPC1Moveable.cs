@@ -38,8 +38,11 @@ public class NPC1Moveable : NPC1
         interpolationTime = 0;
     }
 
-    private void FixedUpdate()
+    protected override void FixedUpdate()
     {
+        // NPC Moveable도 스크롤에 맞춰 내려가도록
+        base.FixedUpdate();
+
         if (isMoving)
         {
             if (isInterpolating) // 보간; 부드럽게 움직이기 위한 코드

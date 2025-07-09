@@ -54,7 +54,7 @@ public abstract class NPC : MonoBehaviour
         Gizmos.DrawWireCube(currentColliderCenter, boxCollider.size * transform.localScale);
     }
     public float scrollSpeed = 2f;
-    void FixedUpdate()
+    protected virtual void FixedUpdate()
     {
         // 스크롤 속도가 0보다 클 때만 (즉, 스크롤 중일 때만) 움직입니다.
         if (GameManager.currentScrollSpeed > 0)
