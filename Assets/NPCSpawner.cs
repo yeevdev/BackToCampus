@@ -7,18 +7,23 @@ public class NPCSpawner : MonoBehaviour
 
     [Header("스폰 설정")]
     public Transform gridStartPosition;
+    public Transform background;
     public int columns = 3;
     public int rows = 5;
-    public float zoneWidth = 10f;
-    public float zoneHeight = 5f;
     public float waveInterval = 10f;
     public int spawnCountPerWave = 4;
 
+    private float zoneWidth = 10f;
+    private float zoneHeight = 5f;
     private List<Vector2> calculatedSpawnZones;
     private string[] genderTags = { "Male", "Female" };
 
     void Awake()
     {
+        // 스폰 존 면적 자동 계산 
+        zoneHeight = background.localScale.y / rows;
+        zoneWidth = background.localScale.x / columns;
+
         // 스폰 존 위치 자동 계산
         calculatedSpawnZones = new List<Vector2>();
         for (int r = 0; r < rows; r++)
@@ -26,7 +31,7 @@ public class NPCSpawner : MonoBehaviour
             for (int c = 0; c < columns; c++)
             {
                 float x = gridStartPosition.position.x + (c * zoneWidth);
-                float y = gridStartPosition.position.y - (r * zoneHeight);
+                float y = gridStartPosition.position.y + (r * zoneHeight);
                 calculatedSpawnZones.Add(new Vector2(x, y));
             }
         }

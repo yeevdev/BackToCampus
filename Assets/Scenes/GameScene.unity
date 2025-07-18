@@ -910,10 +910,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   gridStartPosition: {fileID: 455322031}
+  background: {fileID: 356500507}
   columns: 3
   rows: 5
-  zoneWidth: 0.5
-  zoneHeight: -1
   waveInterval: 1
   spawnCountPerWave: 4
 --- !u!4 &777268009
