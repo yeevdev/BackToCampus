@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class NPCController : MonoBehaviour
 {
@@ -18,6 +19,9 @@ public class NPCController : MonoBehaviour
 
     [Header("참조")]
     public GameObject questionMarkBubble; // 물음표 말풍선 오브젝트
+
+    [Header("충돌 이벤트")]
+    public UnityEvent onPlayerCollision;  // Inspector에서 이벤트 연결 가능
 
     // --- 내부 변수 ---
     private Animator anim;
@@ -67,7 +71,7 @@ public class NPCController : MonoBehaviour
                 RunChaserLogic();
                 break;
         }
-        
+
         // 2. 실제 이동 처리
         float currentSpeed = (behavior == BehaviorType.Chaser) ? moveSpeed : mapScrollSpeed;
         transform.Translate(moveDirection * currentSpeed * Time.deltaTime);
@@ -134,7 +138,7 @@ public class NPCController : MonoBehaviour
             SetMoveDirection(Vector2.down);
         }
     }
-    
+
     private void UpdateAnimator()
     {
         bool isMoving = moveDirection != Vector2.zero;
@@ -146,12 +150,12 @@ public class NPCController : MonoBehaviour
             anim.SetFloat("moveY", moveDirection.y);
         }
     }
-    
+
     private void SetMoveDirection(Vector2 direction)
     {
         moveDirection = direction.normalized;
     }
-    
+
     public void ShowQuestionMark()
     {
         if (questionMarkBubble != null)
@@ -165,5 +169,17 @@ public class NPCController : MonoBehaviour
         questionMarkBubble.SetActive(true);
         yield return new WaitForSeconds(1.5f);
         questionMarkBubble.SetActive(false);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // 물음표 표시
+            ShowQuestionMark();
+
+            // 이벤트 발생
+            onPlayerCollision?.Invoke();
+        }
     }
 }
