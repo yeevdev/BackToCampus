@@ -9,6 +9,10 @@ public class NPCController : MonoBehaviour
     public BehaviorType behavior;
     public enum BehaviorType { Fixed, Chaser }
 
+    [Header("오브젝트 풀")]
+    public PoolType poolType;
+    public enum PoolType { Male, Female }
+
     [Header("맵 스크롤 속도")]
     public float mapScrollSpeed = 3f; // 플레이어의 전진(맵 스크롤) 속도와 맞춰야 합니다.
 
@@ -31,6 +35,7 @@ public class NPCController : MonoBehaviour
     private float randomMoveTimer;
     private bool isPaused = false;
     private bool isChaserLogicActivated = false; // Chaser 로직 활성화 스위치
+    private string PoolTag => poolType.ToString();
 
     void Awake()
     {
@@ -98,7 +103,7 @@ public class NPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
-        gameObject.SetActive(false); // 오브젝트 풀로 반환
+        ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }
 
     private void RunFixedLogic()
