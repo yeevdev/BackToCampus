@@ -1465,6 +1465,18 @@ MonoBehaviour:
   - tag: Female
     prefab: {fileID: 2756065083760134691, guid: 285ea8d5c61bc425f91b8750a5e47dc5, type: 3}
     size: 15
+  - tag: MaleMale
+    prefab: {fileID: 1892038888814880474, guid: 50f1636e6eb81f14b8e779d709acc2df, type: 3}
+    size: 15
+  - tag: MaleFemale
+    prefab: {fileID: 1892038888814880474, guid: e8556af67a023344c826e9aad311747d, type: 3}
+    size: 15
+  - tag: FemaleMale
+    prefab: {fileID: 1892038888814880474, guid: ffec0f956659d4848b6b97b37c20ae0e, type: 3}
+    size: 15
+  - tag: FemaleFemale
+    prefab: {fileID: 1892038888814880474, guid: c33488e7e4699014a8ecf667a9263fa1, type: 3}
+    size: 15
 --- !u!4 &1292296423
 Transform:
   m_ObjectHideFlags: 0
