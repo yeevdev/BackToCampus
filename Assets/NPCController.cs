@@ -54,12 +54,17 @@ public class NPCController : MonoBehaviour
 
     void Update()
     {
-        if (/*!isVisible ||*/ isPaused)
+        if (!isVisible || isPaused)
         {
             SetMoveDirection(Vector2.zero);
             UpdateAnimator();
+            if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가는 코드를 포함
+            {
+                transform.Translate(GameManager.currentScrollSpeed * Time.deltaTime * Vector2.down);
+            }
             return;
         }
+
 
         // 1. 행동 로직 실행
         switch (behavior)
