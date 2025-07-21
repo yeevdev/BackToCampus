@@ -137,7 +137,7 @@ public class NPCController : MonoBehaviour
                 {
                     if (Random.value < 0.8f)
                     {
-                        Vector2 randomDirection = Random.insideUnitSphere.normalized;
+                        Vector2 randomDirection = Random.insideUnitCircle.normalized;
                         SetMoveDirection(randomDirection);
                     }
                     else
