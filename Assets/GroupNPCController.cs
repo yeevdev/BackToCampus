@@ -123,7 +123,7 @@ public class GroupNPCController : MonoBehaviour
     }
 
 
-        public void ShowQuestionMark()
+    public void ShowQuestionMark()
     {
         if (questionMarkBubble != null)
         {
