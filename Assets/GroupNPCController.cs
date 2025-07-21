@@ -26,6 +26,7 @@ public class GroupNPCController : MonoBehaviour
 
     // --- 내부 변수 ---
     private Animator[] animators;
+    private Rigidbody2D rb;
     private Vector2 moveDirection = Vector2.zero;
     private bool isVisible = false;
     private bool isPaused = false;
@@ -34,6 +35,7 @@ public class GroupNPCController : MonoBehaviour
     void Awake()
     {
         animators = GetComponentsInChildren<Animator>();
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void OnEnable()
@@ -48,7 +50,7 @@ public class GroupNPCController : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (!isVisible || isPaused)
         {
@@ -56,7 +58,8 @@ public class GroupNPCController : MonoBehaviour
             UpdateAnimators();
             if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가야 함
             {
-                transform.Translate(GameManager.currentScrollSpeed * Time.deltaTime * Vector2.down);
+                Vector3 downScroll = GameManager.currentScrollSpeed * Time.fixedDeltaTime * Vector2.down;
+                rb.MovePosition(transform.position + downScroll);
             }
             return;
         }
@@ -74,7 +77,8 @@ public class GroupNPCController : MonoBehaviour
 
         // 2. 실제 이동 처리
         float currentSpeed = (behavior == BehaviorType.Moving) ? moveSpeed : 0;
-        transform.Translate((moveDirection * currentSpeed + Vector2.down * GameManager.currentScrollSpeed) * Time.deltaTime);
+        Vector3 displacement = (moveDirection * currentSpeed + Vector2.down * GameManager.currentScrollSpeed) * Time.fixedDeltaTime;
+        rb.MovePosition(transform.position + displacement);
 
         // 3. 애니메이터 업데이트
         UpdateAnimators();
