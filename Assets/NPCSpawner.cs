@@ -29,6 +29,7 @@ public class NPCSpawner : MonoBehaviour
     private string[] genderTags = { "Male", "Female" };
     private string[] groupTags = { "MaleMale", "MaleFemale", "FemaleMale", "FemaleFemale" };
     private List<float> movingGroupsRestrictedColumns; // 수직이동형 스폰 금지 열 저장
+    private float zonePadding = 0.5f; // 생성 시 NPC끼리 겹치지 않기 위한 여분 공간 
 
     void Awake()
     {
@@ -93,7 +94,7 @@ public class NPCSpawner : MonoBehaviour
             }
 
             // 위치 랜덤 설정
-            Vector2 spawnPos = zoneCenter + new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
+            Vector2 spawnPos = zoneCenter + new Vector2(Random.Range(-zoneWidth/2 + zonePadding, zoneWidth/2 - zonePadding), Random.Range(-zoneHeight/2 + zonePadding, zoneHeight - zonePadding));
 
             // 풀에서 NPC 스폰
             GameObject npc = objectPooler.SpawnFromPool(npcTag, spawnPos, Quaternion.identity);
@@ -147,5 +148,30 @@ public class NPCSpawner : MonoBehaviour
     public void RemoveSpawnRestriction(float column)
     {
         movingGroupsRestrictedColumns.Remove(column);
+    }
+
+
+    // 스폰 구역 그리는 테스트용 코드
+    // (가끔 Game 종료 시 여기서 에러 뜨는데 무시해도 될 듯)
+    void OnDrawGizmos()
+    {
+        foreach (Vector2 zone in calculatedSpawnZones)
+        {
+            Gizmos.color = Color.green;
+            // 스폰 구역 중심
+            Gizmos.DrawSphere(zone, 0.1f);
+
+            // 스폰 구역 둘레
+            Vector2[] points = {
+                zone + new Vector2(-zoneWidth / 2 + zonePadding, zoneHeight / 2 - zonePadding),
+                zone + new Vector2(zoneWidth / 2 - zonePadding, zoneHeight / 2 - zonePadding),
+                zone + new Vector2(zoneWidth / 2 - zonePadding, -zoneHeight / 2 + zonePadding),
+                zone + new Vector2(-zoneWidth / 2 + zonePadding, -zoneHeight / 2 + zonePadding)
+            };
+            Gizmos.DrawLine(points[0], points[1]);
+            Gizmos.DrawLine(points[1], points[2]);
+            Gizmos.DrawLine(points[2], points[3]);
+            Gizmos.DrawLine(points[3], points[0]);
+        }
     }
 }
