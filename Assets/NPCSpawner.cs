@@ -10,13 +10,14 @@ public class NPCSpawner : MonoBehaviour
     public Transform background;
     public int columns = 3;
     public int rows = 5;
-    public float waveInterval = 10f;
+    public float waveInterval = 60f;
     public int spawnCountPerWave = 4;
 
     private float zoneWidth = 10f;
     private float zoneHeight = 5f;
     private List<Vector2> calculatedSpawnZones;
     private string[] genderTags = { "Male", "Female" };
+    private string[] groupTags = { "MaleMale", "MaleFemale", "FemaleMale", "FemaleFemale" };
 
     void Awake()
     {
@@ -61,23 +62,47 @@ public class NPCSpawner : MonoBehaviour
         // 2. 선택된 각 위치에 NPC 스폰 및 행동 설정
         foreach (Vector2 zoneCenter in selectedZones)
         {
-            // 성별 랜덤 결정
-            string genderTag = genderTags[Random.Range(0, genderTags.Length)];
-            
+            string npcTag;
+            bool isSingleSpawning = Random.value > 0.5f;
+
+            if (isSingleSpawning)
+            {
+                // 성별 랜덤 결정
+                npcTag = genderTags[Random.Range(0, genderTags.Length)];
+            }
+            else
+            {
+                // 성별 조합 랜덤 결정
+                npcTag = groupTags[Random.Range(0, groupTags.Length)];
+            }
+
             // 위치 랜덤 설정
             Vector2 spawnPos = zoneCenter + new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f));
             
             // 풀에서 NPC 스폰
-            GameObject npc = objectPooler.SpawnFromPool(genderTag, spawnPos, Quaternion.identity);
-
+            GameObject npc = objectPooler.SpawnFromPool(npcTag, spawnPos, Quaternion.identity);
             // 행동 타입 랜덤 결정 후 코드로 설정
-            if (Random.value > 0.5f)
+            if (isSingleSpawning)
             {
-                npc.GetComponent<NPCController>().behavior = NPCController.BehaviorType.Fixed;
+                if (Random.value > 0.5f)
+                {
+                    npc.GetComponent<NPCController>().behavior = NPCController.BehaviorType.Fixed;
+                }
+                else
+                {
+                    npc.GetComponent<NPCController>().behavior = NPCController.BehaviorType.Chaser;
+                }
             }
             else
             {
-                npc.GetComponent<NPCController>().behavior = NPCController.BehaviorType.Chaser;
+                if (Random.value > 0.5f)
+                {
+                    npc.GetComponent<GroupNPCController>().behavior = GroupNPCController.BehaviorType.Fixed;
+                }
+                else
+                {
+                    npc.GetComponent<GroupNPCController>().behavior = GroupNPCController.BehaviorType.Moving;
+                }
             }
         }
     }
