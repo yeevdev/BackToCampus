@@ -102,7 +102,7 @@ public class NPCSpawner : MonoBehaviour
             // 행동 타입 랜덤 결정 후 코드로 설정
             if (isSingleSpawning)
             {
-                if (Random.value > chasingNPCChance) // 추적형 생성
+                if (Random.value > chasingNPCChance) // 고정형 생성
                 {
                     // 수직이동형 스폰 금지 열 등록
                     movingGroupsRestrictedColumns.Add(zoneCenter.x);
@@ -112,7 +112,7 @@ public class NPCSpawner : MonoBehaviour
                     npcController.behavior = NPCController.BehaviorType.Fixed;
                     npcController.ColumnSpawnedIn = zoneCenter.x;
                 }
-                else // 고정형 생성
+                else // 추적형 생성
                 {
                     npc.GetComponent<NPCController>().behavior = NPCController.BehaviorType.Chaser;
                 }
