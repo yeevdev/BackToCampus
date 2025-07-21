@@ -145,10 +145,14 @@ public class NPCSpawner : MonoBehaviour
     }
 
 
-    // 스폰 구역 그리는 테스트용 코드
-    // (가끔 Game 종료 시 여기서 에러 뜨는데 무시해도 될 듯)
+    // 그냥 스폰 구역 그리는 테스트용 코드
     void OnDrawGizmos()
     {
+        if (calculatedSpawnZones == null)
+        {
+            return;
+        }
+    
         foreach (Vector2 zone in calculatedSpawnZones)
         {
             Gizmos.color = Color.green;
