@@ -10,11 +10,8 @@ public class NPCController : MonoBehaviour
     public enum BehaviorType { Fixed, Chaser }
 
     [Header("오브젝트 풀")]
-    public PoolType poolType;
+    public PoolType poolType; // 알맞은 풀에 반환하기 위한 태그
     public enum PoolType { Male, Female }
-
-    [Header("맵 스크롤 속도")]
-    public float mapScrollSpeed = 3f; // 플레이어의 전진(맵 스크롤) 속도와 맞춰야 합니다.
 
     [Header("추적자(Chaser) 설정")]
     public float moveSpeed = 2f;         // 이동 속도
@@ -66,7 +63,7 @@ public class NPCController : MonoBehaviour
         {
             SetMoveDirection(Vector2.zero);
             UpdateAnimator();
-            if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가는 코드를 포함
+            if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가야 함
             {
                 transform.Translate(GameManager.currentScrollSpeed * Time.deltaTime * Vector2.down);
             }
@@ -123,7 +120,7 @@ public class NPCController : MonoBehaviour
         {
             float distanceToPlayer = Vector2.Distance(transform.position, player.position);
             bool isPlayerInSight = (distanceToPlayer < detectionRadius) && (player.position.y < transform.position.y);
-
+            
             if (isPlayerInSight)
             {
                 Vector2 directionToPlayer = (player.position - transform.position).normalized;
@@ -136,7 +133,7 @@ public class NPCController : MonoBehaviour
                 {
                     if (Random.value < 0.8f)
                     {
-                        Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+                        Vector2 randomDirection = Random.insideUnitSphere.normalized;
                         SetMoveDirection(randomDirection);
                     }
                     else
