@@ -21,7 +21,10 @@ public class GroupNPCController : MonoBehaviour
     [Header("충돌 이벤트")]
     public UnityEvent onPlayerCollision;  // Inspector에서 이벤트 연결 가능
 
-    // 내부 변수
+    [Header("생성된 열")]
+    public float ColumnSpawnedIn; // 무슨 열에서 생성되었는지 저장
+
+    // --- 내부 변수 ---
     private Animator[] animators;
     private Vector2 moveDirection = Vector2.zero;
     private bool isVisible = false;
@@ -85,6 +88,7 @@ public class GroupNPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
+        NPCSpawner.Instance.RemoveSpawnRestriction(ColumnSpawnedIn);
         ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }
 
