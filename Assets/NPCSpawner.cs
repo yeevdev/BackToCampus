@@ -94,7 +94,7 @@ public class NPCSpawner : MonoBehaviour
             }
 
             // 위치 랜덤 설정
-            Vector2 spawnPos = zoneCenter + new Vector2(Random.Range(-zoneWidth/2 + zonePadding, zoneWidth/2 - zonePadding), Random.Range(-zoneHeight/2 + zonePadding, zoneHeight - zonePadding));
+            Vector2 spawnPos = zoneCenter + new Vector2(Random.Range(-zoneWidth/2 + zonePadding, zoneWidth/2 - zonePadding), Random.Range(-zoneHeight/2 + zonePadding, zoneHeight/2 - zonePadding));
 
             // 풀에서 NPC 스폰
             GameObject npc = objectPooler.SpawnFromPool(npcTag, spawnPos, Quaternion.identity);
