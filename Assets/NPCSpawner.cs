@@ -102,10 +102,12 @@ public class NPCSpawner : MonoBehaviour
             // 행동 타입 랜덤 결정 후 코드로 설정
             if (isSingleSpawning)
             {
-                if (Random.value > chasingNPCChance)
+                if (Random.value > chasingNPCChance) // 추적형 생성
                 {
                     // 수직이동형 스폰 금지 열 등록
                     movingGroupsRestrictedColumns.Add(zoneCenter.x);
+
+                    // NPC 초기화
                     NPCController npcController = npc.GetComponent<NPCController>();
                     npcController.behavior = NPCController.BehaviorType.Fixed;
                     npcController.ColumnSpawnedIn = zoneCenter.x;
@@ -117,28 +119,20 @@ public class NPCSpawner : MonoBehaviour
             }
             else // 단체 NPC 생성
             {
-                if (Random.value > movingGroupNPCChance)
+                if (Random.value < movingGroupNPCChance
+                    && !movingGroupsRestrictedColumns.Contains(zoneCenter.x)) // 수직이동형 생성
+                {
+                    npc.GetComponent<GroupNPCController>().behavior = GroupNPCController.BehaviorType.Moving;
+                }
+                else // 고정형 생성
                 {
                     // 수직이동형 스폰 금지 열 등록
                     movingGroupsRestrictedColumns.Add(zoneCenter.x);
+
+                    // NPC 초기화
                     GroupNPCController groupNpcController = npc.GetComponent<GroupNPCController>();
                     groupNpcController.behavior = GroupNPCController.BehaviorType.Fixed;
                     groupNpcController.ColumnSpawnedIn = zoneCenter.x;
-                }
-                else
-                {
-                    // 수직이동형 스폰 금지 열이 아니면 수직이동형 생성
-                    if (!movingGroupsRestrictedColumns.Contains(zoneCenter.x))
-                    {
-                        npc.GetComponent<GroupNPCController>().behavior = GroupNPCController.BehaviorType.Moving;
-                    }
-                    else // 고정형 생성
-                    {
-                        movingGroupsRestrictedColumns.Add(zoneCenter.x);
-                        GroupNPCController groupNpcController = npc.GetComponent<GroupNPCController>();
-                        groupNpcController.behavior = GroupNPCController.BehaviorType.Fixed;
-                        groupNpcController.ColumnSpawnedIn = zoneCenter.x;
-                    }
                 }
             }
         }
