@@ -191,11 +191,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   behavior: 0
   poolType: 0
-  mapScrollSpeed: 3
   moveSpeed: 2
-  detectionRadius: 5
-  randomMoveInterval: 2
+  detectionRadius: 4
+  randomMoveInterval: 1
   questionMarkBubble: {fileID: 0}
   onPlayerCollision:
     m_PersistentCalls:
       m_Calls: []
+  ColumnSpawnedIn: 0

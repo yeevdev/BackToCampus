@@ -913,11 +913,11 @@ MonoBehaviour:
   background: {fileID: 356500507}
   columns: 3
   rows: 5
-  waveInterval: 1
+  waveInterval: 5
   spawnCountPerWave: 4
   groupNPCChance: 0.5
   chasingNPCChance: 0.5
-  movingGroupNPCChance: 0.8
+  movingGroupNPCChance: 0.9
 --- !u!4 &777268009
 Transform:
   m_ObjectHideFlags: 0
