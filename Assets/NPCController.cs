@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.Events;
 
 public class NPCController : MonoBehaviour
 {
@@ -8,8 +9,9 @@ public class NPCController : MonoBehaviour
     public BehaviorType behavior;
     public enum BehaviorType { Fixed, Chaser }
 
-    [Header("맵 스크롤 속도")]
-    public float mapScrollSpeed = 3f; // 플레이어의 전진(맵 스크롤) 속도와 맞춰야 합니다.
+    [Header("오브젝트 풀")]
+    public PoolType poolType; // 알맞은 풀에 반환하기 위한 태그
+    public enum PoolType { Male, Female }
 
     [Header("추적자(Chaser) 설정")]
     public float moveSpeed = 2f;         // 이동 속도
@@ -19,19 +21,28 @@ public class NPCController : MonoBehaviour
     [Header("참조")]
     public GameObject questionMarkBubble; // 물음표 말풍선 오브젝트
 
+    [Header("충돌 이벤트")]
+    public UnityEvent onPlayerCollision;  // Inspector에서 이벤트 연결 가능
+
+    [Header("생성된 열")]
+    public float ColumnSpawnedIn; // 무슨 열에서 생성되었는지 저장
+
     // --- 내부 변수 ---
     private Animator anim;
     private Transform player;
+    private Rigidbody2D rb;
     private Vector2 moveDirection = Vector2.zero;
     private bool isVisible = false;
     private float randomMoveTimer;
     private bool isPaused = false;
     private bool isChaserLogicActivated = false; // Chaser 로직 활성화 스위치
+    private string PoolTag => poolType.ToString();
 
     void Awake()
     {
         anim = GetComponentInChildren<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void OnEnable()
@@ -48,14 +59,20 @@ public class NPCController : MonoBehaviour
         }
     }
 
-    void Update()
+    void FixedUpdate()
     {
         if (!isVisible || isPaused)
         {
             SetMoveDirection(Vector2.zero);
             UpdateAnimator();
+            if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가야 함
+            {
+                Vector3 downScroll = GameManager.currentScrollSpeed * Time.fixedDeltaTime * Vector2.down;
+                rb.MovePosition(transform.position + downScroll);
+            }
             return;
         }
+
 
         // 1. 행동 로직 실행
         switch (behavior)
@@ -67,10 +84,11 @@ public class NPCController : MonoBehaviour
                 RunChaserLogic();
                 break;
         }
-        
+
         // 2. 실제 이동 처리
-        float currentSpeed = (behavior == BehaviorType.Chaser) ? moveSpeed : mapScrollSpeed;
-        transform.Translate(moveDirection * currentSpeed * Time.deltaTime);
+        float currentSpeed = (behavior == BehaviorType.Chaser) ? moveSpeed : 0;
+        Vector3 positionChange = (moveDirection * currentSpeed + Vector2.down * GameManager.currentScrollSpeed) * Time.fixedDeltaTime;
+        rb.MovePosition(transform.position + positionChange);
 
         // 3. 애니메이터 업데이트
         UpdateAnimator();
@@ -89,13 +107,14 @@ public class NPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
-        gameObject.SetActive(false); // 오브젝트 풀로 반환
+        NPCSpawner.Instance.RemoveSpawnRestriction(ColumnSpawnedIn);
+        ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }
 
     private void RunFixedLogic()
     {
-        // 고정형 NPC는 항상 화면 아래 방향으로 이동하도록 설정합니다.
-        SetMoveDirection(Vector2.down);
+        // 고정형은 움직이지 않음
+        // SetMoveDirection(Vector2.down);
     }
 
     private void RunChaserLogic()
@@ -105,7 +124,7 @@ public class NPCController : MonoBehaviour
         {
             float distanceToPlayer = Vector2.Distance(transform.position, player.position);
             bool isPlayerInSight = (distanceToPlayer < detectionRadius) && (player.position.y < transform.position.y);
-
+            
             if (isPlayerInSight)
             {
                 Vector2 directionToPlayer = (player.position - transform.position).normalized;
@@ -113,12 +132,12 @@ public class NPCController : MonoBehaviour
             }
             else
             {
-                randomMoveTimer -= Time.deltaTime;
+                randomMoveTimer -= Time.fixedDeltaTime;
                 if (randomMoveTimer <= 0)
                 {
                     if (Random.value < 0.8f)
                     {
-                        Vector2 randomDirection = new Vector2(Random.Range(-1f, 1f), Random.Range(-1f, 1f)).normalized;
+                        Vector2 randomDirection = Random.insideUnitCircle.normalized;
                         SetMoveDirection(randomDirection);
                     }
                     else
@@ -129,12 +148,12 @@ public class NPCController : MonoBehaviour
                 }
             }
         }
-        else // 아직 활성화되지 않았다면 고정형처럼 아래로 내려가기만 함
+        else // 추적/배회가 아닐 때는 움직이지 않음
         {
-            SetMoveDirection(Vector2.down);
+            // SetMoveDirection(Vector2.down);
         }
     }
-    
+
     private void UpdateAnimator()
     {
         bool isMoving = moveDirection != Vector2.zero;
@@ -146,12 +165,12 @@ public class NPCController : MonoBehaviour
             anim.SetFloat("moveY", moveDirection.y);
         }
     }
-    
+
     private void SetMoveDirection(Vector2 direction)
     {
         moveDirection = direction.normalized;
     }
-    
+
     public void ShowQuestionMark()
     {
         if (questionMarkBubble != null)
@@ -165,5 +184,17 @@ public class NPCController : MonoBehaviour
         questionMarkBubble.SetActive(true);
         yield return new WaitForSeconds(1.5f);
         questionMarkBubble.SetActive(false);
+    }
+
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            // 물음표 표시
+            ShowQuestionMark();
+
+            // 이벤트 발생
+            onPlayerCollision?.Invoke();
+        }
     }
 }
