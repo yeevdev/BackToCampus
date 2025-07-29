@@ -600,6 +600,16 @@ MonoBehaviour:
   horizontalBound: 2
   mapRenderer: {fileID: 356500505}
   joystick: {fileID: 1241127704}
+  dashDistance: 3
+  dashTime: 0.15
+  dashUp: {fileID: 1194351725334725258, guid: 09f0e417480044ada89a59a1993ed064, type: 3}
+  dashDown: {fileID: -7718581080960624798, guid: b62997b1ed7a142b085adbb3c0541d7a, type: 3}
+  dashLeft: {fileID: 3057674768944066417, guid: ff00ffec2749147079be6afb6d50ab68, type: 3}
+  dashRight: {fileID: -2262948631809382417, guid: c5ebe1146345443ab83b54a8cef34724, type: 3}
+  ghostPrefab: {fileID: 6674349789483682636, guid: 5ae61adf557e54e018295a3b747a96fc, type: 3}
+  poolSize: 10
+  ghostInterval: 0.05
+  ghostTint: {r: 1, g: 1, b: 1, a: 0.6}
 --- !u!95 &239652287
 Animator:
   serializedVersion: 7
@@ -1373,7 +1383,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d7c599a625b048de81043d20d15b66d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  joystickBackground: {fileID: 88684756}
+  joystickBg: {fileID: 88684756}
   joystickHandle: {fileID: 1294205388}
 --- !u!224 &1241127705
 RectTransform:

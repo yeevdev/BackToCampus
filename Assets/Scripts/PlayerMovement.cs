@@ -1,109 +1,211 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-// 애니메이터 컴포넌트가 반드시 필요함을 명시합니다.
 [RequireComponent(typeof(Animator), typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("플레이어 설정")]
-    [SerializeField] private float speedCoef = 5f;
+    [Header("기본 이동")]
+    [SerializeField] float speedCoef = 5f;
+    [SerializeField] float upBound = 4f, downBound = -4f, horizontalBound = 8f;
+    [SerializeField] Renderer mapRenderer;
+    [SerializeField] JoystickController joystick;
 
-    [Header("이동 범위 제한")]
-    [SerializeField] private float upBound = 4f;
-    [SerializeField] private float downBound = -4f;
-    [SerializeField] private float horizontalBound = 8f;
+    [Header("대시")]
+    [SerializeField] float dashDistance = 3f;
+    [SerializeField] float dashTime = 0.15f;
 
-    [Header("맵 스크롤 설정")]
-    [SerializeField] private Renderer mapRenderer;
+    [Header("대시 스프라이트 (▲▼◀▶)")]
+    [SerializeField] Sprite dashUp, dashDown, dashLeft, dashRight;
 
-    [Header("연결할 오브젝트")]
-    [SerializeField] private JoystickController joystick;
+    [Header("잔상 풀")]
+    [SerializeField] DashGhost ghostPrefab;
+    [SerializeField] int poolSize = 10;
+    [SerializeField] float ghostInterval = 0.05f;
+    [SerializeField] Color ghostTint = new Color(1f, 1f, 1f, 0.6f);
 
-    // --- 기존 변수 ---
-    private Rigidbody2D rb;
-    private Material mapMaterial;
-    private Vector2 moveInput;
-    private float mapWorldHeight;
+    // ─── 내부 ───
+    Rigidbody2D     rb;
+    Animator        anim;
+    SpriteRenderer  sr;
 
-    // ▼▼▼ 애니메이션용으로 추가된 변수 ▼▼▼
-    private Animator animator;
-    private Vector2 lastMoveDirection; // 마지막 이동 방향을 저장
+    Vector2         moveInput;
+    bool            isDashing;
 
-    void Start()
+    // 맵 스크롤
+    Material mapMat;
+    float    mapWorldH;
+
+    // 잔상 풀
+    readonly Queue<DashGhost> pool = new Queue<DashGhost>();
+
+    void Awake()
     {
-        rb = GetComponent<Rigidbody2D>();
+        rb   = GetComponent<Rigidbody2D>();
+        sr   = GetComponent<SpriteRenderer>();
+        anim = GetComponent<Animator>();
+
         rb.gravityScale = 0;
         rb.bodyType = RigidbodyType2D.Kinematic;
 
-        if (mapRenderer != null)
+        if (mapRenderer)
         {
-            mapMaterial = mapRenderer.material;
-            mapWorldHeight = mapRenderer.bounds.size.y;
+            mapMat     = mapRenderer.material;
+            mapWorldH  = mapRenderer.bounds.size.y;
         }
 
-        // ▼▼▼ 애니메이션용으로 추가된 부분 ▼▼▼
-        // 시작할 때 애니메이터 컴포넌트를 찾아와 변수에 할당합니다.
-        animator = GetComponent<Animator>();
+        // 풀 미리 채우기
+        for (int i = 0; i < poolSize; i++)
+            pool.Enqueue(Instantiate(ghostPrefab, transform.parent));
     }
+
+    void OnEnable()  => joystick.OnDash += StartDash;
+    void OnDisable() => joystick.OnDash -= StartDash;
 
     void Update()
     {
-        // 조이스틱 입력을 받습니다.
-        moveInput = new Vector2(joystick.Horizontal, joystick.Vertical);
+        if (isDashing) return;
 
-        // ▼▼▼ 애니메이션용으로 추가된 부분 ▼▼▼
-        // 매 프레임마다 입력 값에 따라 애니메이션 상태를 처리합니다.
+        moveInput = new Vector2(joystick.Horizontal, joystick.Vertical);
         HandleAnimation();
     }
 
-    // FixedUpdate의 기존 이동/스크롤 로직은 그대로 유지됩니다.
     void FixedUpdate()
     {
-        Vector2 newPosition = rb.position + moveInput * speedCoef * Time.fixedDeltaTime;
-        newPosition.x = Mathf.Clamp(newPosition.x, -horizontalBound, horizontalBound);
+        if (isDashing) return;
 
-        bool isScrolling = rb.position.y >= upBound && moveInput.y > 0;
+        Vector2 next = rb.position + moveInput * speedCoef * Time.fixedDeltaTime;
+        next.x = Mathf.Clamp(next.x, -horizontalBound, horizontalBound);
 
-        if (mapMaterial != null && isScrolling && mapWorldHeight > 0)
+        bool scrolling = rb.position.y >= upBound && moveInput.y > 0;
+
+        if (scrolling && mapMat && mapWorldH > 0)
         {
-            // 이 부분은 기존 코드와 동일합니다.
-            GameManager.currentScrollSpeed = moveInput.y * speedCoef; // GameManager가 있다면 사용
-            newPosition.y = upBound;
-            
-            float worldScrollDistance = (moveInput.y * speedCoef) * Time.fixedDeltaTime;
-            float uvScrollAmount = worldScrollDistance / mapWorldHeight;
-            mapMaterial.mainTextureOffset += new Vector2(0, uvScrollAmount);
+            next.y = upBound;
+
+            float worldMove = moveInput.y * speedCoef * Time.fixedDeltaTime;
+            mapMat.mainTextureOffset += new Vector2(0, worldMove / mapWorldH);
         }
         else
         {
-            // 이 부분은 기존 코드와 동일합니다.
-            GameManager.currentScrollSpeed = 0f; // GameManager가 있다면 사용
-            newPosition.y = Mathf.Clamp(newPosition.y, downBound, upBound);
+            next.y = Mathf.Clamp(next.y, downBound, upBound);
         }
 
-        rb.MovePosition(newPosition);
+        rb.MovePosition(next);
     }
-    
-    // ▼▼▼ 애니메이션용으로 추가된 메서드 ▼▼▼
-    /// <summary>
-    /// 이동 입력 값에 따라 애니메이터의 파라미터를 설정하는 함수
-    /// </summary>
-    private void HandleAnimation()
+
+    // ── 대시 시작 ──
+    void StartDash(Vector2 dir)
     {
-        // 조이스틱을 움직이고 있을 때
-        if (moveInput.magnitude > 0.1f)
+        if (!isDashing)
+            StartCoroutine(DashRoutine(dir));
+    }
+
+    // ── 대시 코루틴 ──
+    IEnumerator DashRoutine(Vector2 dir)
+    {
+        isDashing = true;
+
+        anim.enabled = false;
+        Sprite orgSpr = sr.sprite;
+        Sprite dashSpr = DirToSprite(dir);
+        sr.sprite = dashSpr;
+
+        Vector2 start   = rb.position;
+        Vector2 target  = start + dir * dashDistance;
+
+        float elapsed   = 0f;
+        float ghostTm   = 0f;
+        float prevRawY  = start.y;
+        float scrollAcc = 0f;     // ★ 누적 스크롤량(월드 단위)
+
+        while (elapsed < dashTime)
         {
-            animator.SetBool("isMoving", true);
-            animator.SetFloat("moveX", moveInput.x);
-            animator.SetFloat("moveY", moveInput.y);
-            lastMoveDirection = moveInput;
+            elapsed += Time.fixedDeltaTime;
+            float t  = elapsed / dashTime;
+
+            Vector2 rawNext = Vector2.Lerp(start, target, t);
+            Vector2 next    = rawNext;
+
+            if (rawNext.y > upBound)
+            {
+                next.y = upBound;
+
+                // Δ overshoot
+                float ovNow   = rawNext.y - upBound;
+                float ovPrev  = Mathf.Max(0, prevRawY - upBound);
+                float deltaOv = ovNow - ovPrev;
+
+                // 맵 스크롤
+                if (mapMat && mapWorldH > 0)
+                    mapMat.mainTextureOffset += new Vector2(0, deltaOv / mapWorldH);
+
+                scrollAcc += deltaOv;               // ★ 누적 스크롤량 갱신
+            }
+
+            next.x = Mathf.Clamp(next.x, -horizontalBound, horizontalBound);
+            next.y = Mathf.Clamp(next.y,  downBound,        upBound);
+            rb.MovePosition(next);
+
+            // ─── 잔상 ───
+            ghostTm += Time.fixedDeltaTime;
+            if (ghostTm >= ghostInterval)
+            {
+                ghostTm = 0f;
+
+                // ① 플레이어 현재 위치 next
+                // ② 누적 스크롤만큼 아래로 오프셋
+                Vector2 ghostPos = next;
+                ghostPos.y -= scrollAcc;            // ★ 바로 이 한 줄!
+                SpawnGhost(dashSpr, ghostPos);
+            }
+
+            prevRawY = rawNext.y;
+            yield return new WaitForFixedUpdate();
         }
-        // 멈췄을 때
+
+        sr.sprite = orgSpr;
+        anim.enabled = true;
+        isDashing = false;
+    }
+
+    // ── 잔상 풀 사용 ──
+    void SpawnGhost(Sprite spr, Vector2 pos)
+    {
+        DashGhost g = pool.Count > 0 ? pool.Dequeue()
+                                    : Instantiate(ghostPrefab, transform.parent);
+
+        g.transform.position = pos;               // rawNext 좌표
+        g.transform.localScale = sr.transform.localScale;
+        g.Spawn(spr, ghostTint, ReturnGhost);
+    }
+    void ReturnGhost(DashGhost g) => pool.Enqueue(g);
+
+    // ── 방향 → 스프라이트 ──
+    Sprite DirToSprite(Vector2 dir)
+    {
+        if (Mathf.Abs(dir.x) > Mathf.Abs(dir.y))
+            return dir.x > 0 ? dashRight : dashLeft;
+        else
+            return dir.y > 0 ? dashUp    : dashDown;
+    }
+
+    // ── 걷기 애니메이션 유지 ──
+    Vector2 lastDir;
+    void HandleAnimation()
+    {
+        if (moveInput.sqrMagnitude > 0.01f)
+        {
+            anim.SetBool("isMoving", true);
+            anim.SetFloat("moveX", moveInput.x);
+            anim.SetFloat("moveY", moveInput.y);
+            lastDir = moveInput;
+        }
         else
         {
-            animator.SetBool("isMoving", false);
-            // 마지막으로 바라보던 방향을 계속 전달하여 Idle 방향을 유지합니다.
-            animator.SetFloat("moveX", lastMoveDirection.x);
-            animator.SetFloat("moveY", lastMoveDirection.y);
+            anim.SetBool("isMoving", false);
+            anim.SetFloat("moveX", lastDir.x);
+            anim.SetFloat("moveY", lastDir.y);
         }
     }
 }
