@@ -10,7 +10,7 @@ public class JoystickController : MonoBehaviour,
     IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     [Header("UI")]
-    [SerializeField] private RectTransform joystickBg;
+    [SerializeField] private RectTransform joystickBg; // 조이스틱 베이스
     [SerializeField] private RectTransform joystickHandle;
 
     public event Action<Vector2> OnDash;   // 대시 알림
@@ -24,7 +24,12 @@ public class JoystickController : MonoBehaviour,
 
     void Awake()
     {
-        _radius = joystickBg.sizeDelta.x * 0.5f;
+        // 1. 베이스 각 코너의 좌표 구하기 
+        // 2. 두 코너의 좌표로부터 베이스의 반지름 추출
+        Vector3[] corners = { Vector3.zero, Vector3.zero, Vector3.zero, Vector3.zero };
+        joystickBg.GetWorldCorners(corners);
+        _radius = (corners[2] - corners[0]).x / 2;
+
         joystickBg.gameObject.SetActive(false);
     }
 
