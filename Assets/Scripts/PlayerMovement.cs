@@ -84,11 +84,13 @@ public class PlayerMovement : MonoBehaviour
             next.y = upBound;
 
             float worldMove = moveInput.y * speedCoef * Time.fixedDeltaTime;
+            GameManager.currentScrollSpeed = moveInput.y * speedCoef;
             mapMat.mainTextureOffset += new Vector2(0, worldMove / mapWorldH);
         }
         else
         {
             next.y = Mathf.Clamp(next.y, downBound, upBound);
+            GameManager.currentScrollSpeed = 0f;  // ★ 스크롤 멈춤
         }
 
         rb.MovePosition(next);
@@ -138,9 +140,16 @@ public class PlayerMovement : MonoBehaviour
 
                 // 맵 스크롤
                 if (mapMat && mapWorldH > 0)
+                {
+                    GameManager.currentScrollSpeed = deltaOv / Time.fixedDeltaTime;
                     mapMat.mainTextureOffset += new Vector2(0, deltaOv / mapWorldH);
+                }
 
                 scrollAcc += deltaOv;               // ★ 누적 스크롤량 갱신
+            }
+            else
+            {
+                GameManager.currentScrollSpeed = 0f;  // ★ 스크롤 멈춤
             }
 
             next.x = Mathf.Clamp(next.x, -horizontalBound, horizontalBound);
