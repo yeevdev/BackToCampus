@@ -119,7 +119,6 @@ public class PlayerMovement : MonoBehaviour
         float elapsed   = 0f;
         float ghostTm   = 0f;
         float prevRawY  = start.y;
-        float scrollAcc = 0f;     // ★ 누적 스크롤량(월드 단위)
 
         while (elapsed < dashTime)
         {
@@ -144,8 +143,6 @@ public class PlayerMovement : MonoBehaviour
                     GameManager.currentScrollSpeed = deltaOv / Time.fixedDeltaTime;
                     mapMat.mainTextureOffset += new Vector2(0, deltaOv / mapWorldH);
                 }
-
-                scrollAcc += deltaOv;               // ★ 누적 스크롤량 갱신
             }
             else
             {
@@ -162,10 +159,8 @@ public class PlayerMovement : MonoBehaviour
             {
                 ghostTm = 0f;
 
-                // ① 플레이어 현재 위치 next
-                // ② 누적 스크롤만큼 아래로 오프셋
+                // 플레이어 현재 위치 next
                 Vector2 ghostPos = next;
-                ghostPos.y -= scrollAcc;            // ★ 바로 이 한 줄!
                 SpawnGhost(dashSpr, ghostPos);
             }
 
