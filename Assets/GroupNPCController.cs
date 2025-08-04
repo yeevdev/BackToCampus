@@ -1,6 +1,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.Events;
+using UnityEngine.Rendering;
 
 public class GroupNPCController : MonoBehaviour
 {
@@ -31,11 +32,13 @@ public class GroupNPCController : MonoBehaviour
     private bool isVisible = false;
     private bool isPaused = false;
     private string PoolTag => poolType.ToString();
+    private SpriteRenderer[] renderers;
 
     void Awake()
     {
         animators = GetComponentsInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
+        renderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     void OnEnable()
@@ -48,15 +51,19 @@ public class GroupNPCController : MonoBehaviour
         {
             questionMarkBubble.SetActive(false);
         }
+        foreach (SpriteRenderer renderer in renderers)
+        {
+            GameManager.AddDimmingSprites(renderer);
+        }
     }
 
     void FixedUpdate()
     {
-        if (!isVisible || isPaused)
+        if (!isVisible || isPaused || GameManager.isPlayerDashing)
         {
             moveDirection = Vector2.zero;
             UpdateAnimators();
-            if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가야 함
+            if (!isPaused) // 게임이 일시정지 된 것이 아니면 맵 스크롤에 의해 내려가야 함
             {
                 Vector3 downScroll = GameManager.currentScrollSpeed * Time.fixedDeltaTime * Vector2.down;
                 rb.MovePosition(transform.position + downScroll);
@@ -92,6 +99,10 @@ public class GroupNPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
+        foreach (SpriteRenderer renderer in renderers)
+        {
+            GameManager.RemoveDimmingSprites(renderer);
+        }
         NPCSpawner.Instance.RemoveSpawnRestriction(ColumnSpawnedIn);
         ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -100,7 +101,24 @@ public class PlayerMovement : MonoBehaviour
     void StartDash(Vector2 dir)
     {
         if (!isDashing)
+        {
+            StartCoroutine(FocusOnPlayer(dashTime));
             StartCoroutine(DashRoutine(dir));
+        }
+    }
+
+    // ── 강조 코루틴 ──
+    IEnumerator FocusOnPlayer(float duration)
+    {
+        GameManager.isPlayerDashing = true;
+
+        GameManager.DimSprites();
+
+        yield return new WaitForSeconds(duration);
+
+        GameManager.UndimSprites();
+
+        GameManager.isPlayerDashing = false;
     }
 
     // ── 대시 코루틴 ──
@@ -152,7 +170,7 @@ public class PlayerMovement : MonoBehaviour
             next.x = Mathf.Clamp(next.x, -horizontalBound, horizontalBound);
             next.y = Mathf.Clamp(next.y,  downBound,        upBound);
             rb.MovePosition(next);
-
+ 
             // ─── 잔상 ───
             ghostTm += Time.fixedDeltaTime;
             if (ghostTm >= ghostInterval)

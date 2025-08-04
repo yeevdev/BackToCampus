@@ -1519,6 +1519,11 @@ MonoBehaviour:
   startUI: {fileID: 932060882}
   joystick: {fileID: 1337057513}
   dashCooldownBar: {fileID: 406393854}
+  dimmingSpritesSetting: []
+  dimmingMeshesSetting:
+  - {fileID: 356500505}
+  dimmingGraphicsSetting: []
+  dimnessSetting: 0.5
 --- !u!4 &1130972269
 Transform:
   m_ObjectHideFlags: 0

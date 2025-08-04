@@ -37,12 +37,14 @@ public class NPCController : MonoBehaviour
     private bool isPaused = false;
     private bool isChaserLogicActivated = false; // Chaser 로직 활성화 스위치
     private string PoolTag => poolType.ToString();
+    private SpriteRenderer sr;
 
     void Awake()
     {
         anim = GetComponentInChildren<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
     }
 
     void OnEnable()
@@ -57,15 +59,16 @@ public class NPCController : MonoBehaviour
         {
             questionMarkBubble.SetActive(false);
         }
+        GameManager.AddDimmingSprites(sr);
     }
 
     void FixedUpdate()
     {
-        if (!isVisible || isPaused)
+        if (!isVisible || isPaused || GameManager.isPlayerDashing)
         {
             SetMoveDirection(Vector2.zero);
             UpdateAnimator();
-            if (!isVisible) // 보이지 않을 경우에는 맵 스크롤에 의해 내려가야 함
+            if (!isPaused) // 게임이 일시정지 된 것이 아니면 맵 스크롤에 의해 내려가야 함
             {
                 Vector3 downScroll = GameManager.currentScrollSpeed * Time.fixedDeltaTime * Vector2.down;
                 rb.MovePosition(transform.position + downScroll);
@@ -107,6 +110,7 @@ public class NPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
+        GameManager.RemoveDimmingSprites(sr);
         NPCSpawner.Instance.RemoveSpawnRestriction(ColumnSpawnedIn);
         ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }
