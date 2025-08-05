@@ -25,6 +25,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float ghostInterval = 0.05f;
     [SerializeField] Color ghostTint = new Color(1f, 1f, 1f, 0.6f);
 
+    [Header("스포트라이팅")]
+    [SerializeField] DimmingLayer dimmingLayer;
+
     // ─── 내부 ───
     Rigidbody2D     rb;
     Animator        anim;
@@ -112,11 +115,11 @@ public class PlayerMovement : MonoBehaviour
     {
         GameManager.isPlayerDashing = true;
 
-        GameManager.DimSprites();
+        dimmingLayer.Dim();
 
         yield return new WaitForSeconds(duration);
 
-        GameManager.UndimSprites();
+        dimmingLayer.Undim();
 
         GameManager.isPlayerDashing = false;
     }

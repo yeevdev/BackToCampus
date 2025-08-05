@@ -25,20 +25,26 @@ public class GroupNPCController : MonoBehaviour
     [Header("생성된 열")]
     public float ColumnSpawnedIn; // 무슨 열에서 생성되었는지 저장
 
+    [Header("회피 이벤트")]
+    public float dashRadius = 2f;
+
     // --- 내부 변수 ---
     private Animator[] animators;
+     private Transform player;
     private Rigidbody2D rb;
     private Vector2 moveDirection = Vector2.zero;
     private bool isVisible = false;
     private bool isPaused = false;
     private string PoolTag => poolType.ToString();
-    private SpriteRenderer[] renderers;
+    private SpriteRenderer[] spriteRenderers;
+
 
     void Awake()
     {
         animators = GetComponentsInChildren<Animator>();
+        player = GameObject.FindGameObjectWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
-        renderers = GetComponentsInChildren<SpriteRenderer>();
+        spriteRenderers = GetComponentsInChildren<SpriteRenderer>();
     }
 
     void OnEnable()
@@ -50,10 +56,6 @@ public class GroupNPCController : MonoBehaviour
         if (questionMarkBubble != null)
         {
             questionMarkBubble.SetActive(false);
-        }
-        foreach (SpriteRenderer renderer in renderers)
-        {
-            GameManager.AddDimmingSprites(renderer);
         }
     }
 
@@ -89,6 +91,15 @@ public class GroupNPCController : MonoBehaviour
 
         // 3. 애니메이터 업데이트
         UpdateAnimators();
+
+        // 4. 플레이어가 충분히 가까우면 회피시에도 어두워지지 않게 Sort Layer 변경
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        bool isPlayerCloseEnough = distanceToPlayer < dashRadius;
+
+        foreach (SpriteRenderer spriteRenderer in spriteRenderers)
+        {
+            DimmingLayer.SetDimmingRenderer(spriteRenderer, !isPlayerCloseEnough); // 가까우면 안 어두워지게
+        }
     }
 
     private void OnBecameVisible()
@@ -99,10 +110,6 @@ public class GroupNPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
-        foreach (SpriteRenderer renderer in renderers)
-        {
-            GameManager.RemoveDimmingSprites(renderer);
-        }
         NPCSpawner.Instance.RemoveSpawnRestriction(ColumnSpawnedIn);
         ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }

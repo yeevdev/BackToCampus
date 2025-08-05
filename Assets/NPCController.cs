@@ -27,6 +27,9 @@ public class NPCController : MonoBehaviour
     [Header("생성된 열")]
     public float ColumnSpawnedIn; // 무슨 열에서 생성되었는지 저장
 
+    [Header("회피 이벤트")]
+    public float dashRadius = 2f;
+
     // --- 내부 변수 ---
     private Animator anim;
     private Transform player;
@@ -37,14 +40,14 @@ public class NPCController : MonoBehaviour
     private bool isPaused = false;
     private bool isChaserLogicActivated = false; // Chaser 로직 활성화 스위치
     private string PoolTag => poolType.ToString();
-    private SpriteRenderer sr;
+    private SpriteRenderer spriteRenderer;
 
     void Awake()
     {
         anim = GetComponentInChildren<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
+        spriteRenderer = GetComponent<SpriteRenderer>();
     }
 
     void OnEnable()
@@ -59,7 +62,6 @@ public class NPCController : MonoBehaviour
         {
             questionMarkBubble.SetActive(false);
         }
-        GameManager.AddDimmingSprites(sr);
     }
 
     void FixedUpdate()
@@ -95,6 +97,12 @@ public class NPCController : MonoBehaviour
 
         // 3. 애니메이터 업데이트
         UpdateAnimator();
+
+        // 4. 플레이어가 충분히 가까우면 회피시에도 어두워지지 않게 Sort Layer 변경
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        bool isPlayerCloseEnough = distanceToPlayer < dashRadius;
+        
+        DimmingLayer.SetDimmingRenderer(spriteRenderer, !isPlayerCloseEnough); // 가까우면 안 어두워지게
     }
 
     void OnBecameVisible()
@@ -110,7 +118,6 @@ public class NPCController : MonoBehaviour
     void OnBecameInvisible()
     {
         isVisible = false;
-        GameManager.RemoveDimmingSprites(sr);
         NPCSpawner.Instance.RemoveSpawnRestriction(ColumnSpawnedIn);
         ObjectPooler.Instance.ReturnToPool(gameObject, PoolTag);
     }
