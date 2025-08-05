@@ -158,7 +158,7 @@ public class GroupNPCController : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
+        if (!GameManager.isPlayerDashing && other.CompareTag("Player"))
         {
             // 물음표 표시
             ShowQuestionMark();
