@@ -231,9 +231,6 @@ public class NPCController : MonoBehaviour
     {
         if (!GameManager.isPlayerDashing && other.CompareTag("Player"))
         {
-            // 물음표 표시
-            ShowQuestionMark();
-
             // 이벤트 발생
             onPlayerCollision?.Invoke();
         }
