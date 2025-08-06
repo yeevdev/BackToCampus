@@ -41,6 +41,8 @@ public class NPCController : MonoBehaviour
     private bool isChaserLogicActivated = false; // Chaser 로직 활성화 스위치
     private string PoolTag => poolType.ToString();
     private SpriteRenderer spriteRenderer;
+    private bool didDashAlreadySucceed = false;
+    public int scoreWhenDashSucceed = 10;
 
     void Awake()
     {
@@ -66,20 +68,45 @@ public class NPCController : MonoBehaviour
 
     void FixedUpdate()
     {
+        // --- 프레임마다 항상 실행되어야 하는 로직 ---
+
+        // 0. 플레이어와의 거리를 계산하여 대시 성공 판정에 사용합니다.
+        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
+        bool isPlayerCloseEnough = distanceToPlayer < dashRadius;
+
+        // 1. 플레이어가 충분히 가까우면 어두워지지 않도록 Sorting Layer를 조절합니다.
+        if (!GameManager.isPlayerDashing) // 대시 중에는 어두워지는 NPC가 뱐걍되지 않도록
+        {
+            DimmingLayer.SetDimmingRenderer(spriteRenderer, !isPlayerCloseEnough); // isPlayerCloseEnough가 true이면 '밝게' 유지합니다.
+        }
+
+        // 2. 플레이어가 가까이서 대시했을 때 점수를 추가하고 물음표를 표시합니다. (최초 한 번만)
+        if (!didDashAlreadySucceed && isPlayerCloseEnough && GameManager.isPlayerDashing)
+        {
+            didDashAlreadySucceed = true; // 중복 점수 획득 방지
+            PlayerDashSuceeded();
+        }
+
+        // --- NPC의 상태에 따라 분기되는 로직 ---
+
+        // 3. 화면 밖이거나, 일시정지, 또는 플레이어가 대시 중일 때는 NPC의 행동을 멈춥니다.
         if (!isVisible || isPaused || GameManager.isPlayerDashing)
         {
-            SetMoveDirection(Vector2.zero);
-            UpdateAnimator();
-            if (!isPaused) // 게임이 일시정지 된 것이 아니면 맵 스크롤에 의해 내려가야 함
+            SetMoveDirection(Vector2.zero); // 이동 방향 초기화
+            UpdateAnimator(); // 애니메이션을 멈춤 상태로 업데이트
+
+            // 게임이 일시정지 된 것이 아니라면 (즉, 플레이어 대시 또는 화면 밖) 맵 스크롤에 의해 아래로 내려갑니다.
+            if (!isPaused)
             {
                 Vector3 downScroll = GameManager.currentScrollSpeed * Time.fixedDeltaTime * Vector2.down;
                 rb.MovePosition(transform.position + downScroll);
             }
-            return;
+            return; // 아래의 행동 로직을 실행하지 않고 메서드를 종료합니다.
         }
 
+        // --- NPC가 정상적으로 행동하는 로직 ---
 
-        // 1. 행동 로직 실행
+        // 4. 행동 타입에 따라 로직을 실행합니다.
         switch (behavior)
         {
             case BehaviorType.Fixed:
@@ -90,19 +117,22 @@ public class NPCController : MonoBehaviour
                 break;
         }
 
-        // 2. 실제 이동 처리
+        // 5. 계산된 이동 방향과 속도에 따라 실제로 위치를 이동시킵니다.
         float currentSpeed = (behavior == BehaviorType.Chaser) ? moveSpeed : 0;
-        Vector3 positionChange = (moveDirection * currentSpeed + Vector2.down * GameManager.currentScrollSpeed) * Time.fixedDeltaTime;
-        rb.MovePosition(transform.position + positionChange);
+        Vector3 displacement = (moveDirection * currentSpeed + Vector2.down * GameManager.currentScrollSpeed) * Time.fixedDeltaTime;
+        rb.MovePosition(transform.position + displacement);
 
-        // 3. 애니메이터 업데이트
+        // 6. 이동 상태에 맞춰 애니메이터를 업데이트합니다.
         UpdateAnimator();
+    }
 
-        // 4. 플레이어가 충분히 가까우면 회피시에도 어두워지지 않게 Sort Layer 변경
-        float distanceToPlayer = Vector2.Distance(transform.position, player.position);
-        bool isPlayerCloseEnough = distanceToPlayer < dashRadius;
-        
-        DimmingLayer.SetDimmingRenderer(spriteRenderer, !isPlayerCloseEnough); // 가까우면 안 어두워지게
+    // 플레이어가 대시 성공!
+    private void PlayerDashSuceeded()
+    {
+        // 점수 주기
+        GameManager.score += scoreWhenDashSucceed;
+        // NPC에 물음표 띄우기
+        ShowQuestionMark();
     }
 
     void OnBecameVisible()
