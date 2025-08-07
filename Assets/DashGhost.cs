@@ -9,9 +9,14 @@ public class DashGhost : MonoBehaviour
     [SerializeField] float fadeTime = 0.25f;
 
     SpriteRenderer _sr;
+    Rigidbody2D _rb;
     System.Action<DashGhost> _onReturn;   // 풀로 되돌릴 콜백
 
-    void Awake() => _sr = GetComponent<SpriteRenderer>();
+    void Awake()
+    {
+        _sr = GetComponent<SpriteRenderer>();
+        _rb = GetComponent<Rigidbody2D>();
+    }
 
     public void Spawn(Sprite sprite, Color tint,
                       System.Action<DashGhost> returnCallback)
@@ -39,5 +44,10 @@ public class DashGhost : MonoBehaviour
 
         gameObject.SetActive(false);
         _onReturn?.Invoke(this);          // 풀에 반환
+    }
+
+    void FixedUpdate()
+    {   // 스크롤에 맞춰 움직임
+        _rb.MovePosition(_rb.position + GameManager.currentScrollSpeed * Time.fixedDeltaTime * Vector2.down);
     }
 }

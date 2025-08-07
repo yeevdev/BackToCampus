@@ -42,5 +42,11 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Dimming
+    uniqueID: 94884427
+    locked: 0
+  - name: NoDimming
+    uniqueID: 1557256649
+    locked: 0
   m_RenderingLayers:
   - Default
