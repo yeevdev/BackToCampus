@@ -14,7 +14,7 @@ public class DashCooldownBar : MonoBehaviour
         bar = GetComponent<Slider>();
     }
 
-    private void LateUpdate() // LateUpdate VS Update 테스트 해보기
+    private void LateUpdate()
     {
         transform.position = Camera.main.WorldToScreenPoint(player.position + new Vector3(displayingOffset.x, displayingOffset.y));
         bar.value = joystick.DashTimer / joystick.dashCooldown;
