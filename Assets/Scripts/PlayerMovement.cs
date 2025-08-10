@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -23,6 +24,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] int poolSize = 10;
     [SerializeField] float ghostInterval = 0.05f;
     [SerializeField] Color ghostTint = new Color(1f, 1f, 1f, 0.6f);
+
+    [Header("스포트라이팅")]
+    [SerializeField] DimmingLayer dimmingLayer;
 
     // ─── 내부 ───
     Rigidbody2D     rb;
@@ -84,11 +88,13 @@ public class PlayerMovement : MonoBehaviour
             next.y = upBound;
 
             float worldMove = moveInput.y * speedCoef * Time.fixedDeltaTime;
+            GameManager.currentScrollSpeed = moveInput.y * speedCoef;
             mapMat.mainTextureOffset += new Vector2(0, worldMove / mapWorldH);
         }
         else
         {
             next.y = Mathf.Clamp(next.y, downBound, upBound);
+            GameManager.currentScrollSpeed = 0f;  // ★ 스크롤 멈춤
         }
 
         rb.MovePosition(next);
@@ -98,7 +104,24 @@ public class PlayerMovement : MonoBehaviour
     void StartDash(Vector2 dir)
     {
         if (!isDashing)
+        {
+            StartCoroutine(FocusOnPlayer(dashTime));
             StartCoroutine(DashRoutine(dir));
+        }
+    }
+
+    // ── 강조 코루틴 ──
+    IEnumerator FocusOnPlayer(float duration)
+    {
+        GameManager.isPlayerDashing = true;
+
+        dimmingLayer.Dim();
+
+        yield return new WaitForSeconds(duration);
+
+        dimmingLayer.Undim();
+
+        GameManager.isPlayerDashing = false;
     }
 
     // ── 대시 코루틴 ──
@@ -117,7 +140,6 @@ public class PlayerMovement : MonoBehaviour
         float elapsed   = 0f;
         float ghostTm   = 0f;
         float prevRawY  = start.y;
-        float scrollAcc = 0f;     // ★ 누적 스크롤량(월드 단위)
 
         while (elapsed < dashTime)
         {
@@ -138,25 +160,28 @@ public class PlayerMovement : MonoBehaviour
 
                 // 맵 스크롤
                 if (mapMat && mapWorldH > 0)
+                {
+                    GameManager.currentScrollSpeed = deltaOv / Time.fixedDeltaTime;
                     mapMat.mainTextureOffset += new Vector2(0, deltaOv / mapWorldH);
-
-                scrollAcc += deltaOv;               // ★ 누적 스크롤량 갱신
+                }
+            }
+            else
+            {
+                GameManager.currentScrollSpeed = 0f;  // ★ 스크롤 멈춤
             }
 
             next.x = Mathf.Clamp(next.x, -horizontalBound, horizontalBound);
             next.y = Mathf.Clamp(next.y,  downBound,        upBound);
             rb.MovePosition(next);
-
+ 
             // ─── 잔상 ───
             ghostTm += Time.fixedDeltaTime;
             if (ghostTm >= ghostInterval)
             {
                 ghostTm = 0f;
 
-                // ① 플레이어 현재 위치 next
-                // ② 누적 스크롤만큼 아래로 오프셋
+                // 플레이어 현재 위치 next
                 Vector2 ghostPos = next;
-                ghostPos.y -= scrollAcc;            // ★ 바로 이 한 줄!
                 SpawnGhost(dashSpr, ghostPos);
             }
 
