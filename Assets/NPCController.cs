@@ -29,6 +29,11 @@ public class NPCController : MonoBehaviour
 
     [Header("회피 이벤트")]
     public float dashRadius = 2f;
+    public int scoreWhenDashSucceed = 10;
+
+    [Header("대화 이벤트")]
+    public GameObject exclamationMarkBubble;
+    public float timeForExclamationMarkBubble = 1.5f;
 
     // --- 내부 변수 ---
     private Animator anim;
@@ -42,7 +47,7 @@ public class NPCController : MonoBehaviour
     private string PoolTag => poolType.ToString();
     private SpriteRenderer spriteRenderer;
     private bool didDashAlreadySucceed = false;
-    public int scoreWhenDashSucceed = 10;
+    private bool isInConversation = false;
 
     void Awake()
     {
@@ -50,6 +55,7 @@ public class NPCController : MonoBehaviour
         player = GameObject.FindGameObjectWithTag("Player").transform;
         rb = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
+        onPlayerCollision.AddListener(StartConversation);
     }
 
     void OnEnable()
@@ -90,7 +96,7 @@ public class NPCController : MonoBehaviour
         // --- NPC의 상태에 따라 분기되는 로직 ---
 
         // 3. 화면 밖이거나, 일시정지, 또는 플레이어가 대시 중일 때는 NPC의 행동을 멈춥니다.
-        if (!isVisible || isPaused || GameManager.isPlayerDashing)
+        if (!isVisible || isPaused || GameManager.isPlayerDashing || isInConversation)
         {
             SetMoveDirection(Vector2.zero); // 이동 방향 초기화
             UpdateAnimator(); // 애니메이션을 멈춤 상태로 업데이트
@@ -193,6 +199,28 @@ public class NPCController : MonoBehaviour
         {
             // SetMoveDirection(Vector2.down);
         }
+    }
+
+    private void StartConversation()
+    {
+        if (!GameManager.isConversationInProgress)
+        {
+            isInConversation = true;
+            StartCoroutine(ConversationCoroutine());
+        }
+    }
+
+    private IEnumerator ConversationCoroutine()
+    {
+        // 느낌표 표시
+        exclamationMarkBubble.SetActive(true);
+        yield return new WaitForSecondsRealtime(timeForExclamationMarkBubble);
+        exclamationMarkBubble.SetActive(false);
+
+        // 대화 시작
+        StartCoroutine(ConversationDisplay.Instance.Conversation());
+
+        isInConversation = false;
     }
 
     private void UpdateAnimator()

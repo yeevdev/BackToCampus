@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 72be6ee55be98634d94dbe97c09387d8
+guid: 1271f24e407160747a2d857ea514c5fa
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -456219193181549398
-    second: yellowgage_full_0
+      213: 1422331697525926498
+    second: "\uB290\uB08C\uD45C1_0"
+  - first:
+      213: 7217996252415048587
+    second: "\uB290\uB08C\uD45C1_1"
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -46,7 +49,7 @@ TextureImporter:
   nPOTScale: 0
   lightmap: 0
   compressionQuality: 50
-  spriteMode: 2
+  spriteMode: 1
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 0
@@ -113,13 +116,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: yellowgage_full_0
+      name: "\uB290\uB08C\uD45C1_0"
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 144
-        height: 32
+        x: 12
+        y: 6
+        width: 8
+        height: 20
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +131,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: aacc2ba9f0f2ba9f0800000000000000
-      internalID: -456219193181549398
+      spriteID: 26aafcf94232db310800000000000000
+      internalID: 1422331697525926498
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: "\uB290\uB08C\uD45C1_1"
+      rect:
+        serializedVersion: 2
+        x: 13
+        y: 1
+        width: 6
+        height: 6
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b8bbc4759597b2460800000000000000
+      internalID: 7217996252415048587
       vertices: []
       indices: 
       edges: []
@@ -138,7 +163,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -148,7 +173,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      yellowgage_full_0: -456219193181549398
+      "\uB290\uB08C\uD45C1_0": 1422331697525926498
+      "\uB290\uB08C\uD45C1_1": 7217996252415048587
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

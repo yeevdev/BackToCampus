@@ -147,7 +147,8 @@ TextureImporter:
     secondaryTextures: []
     spriteCustomMetadata:
       entries: []
-    nameFileIdTable: {}
+    nameFileIdTable:
+      yellowgage_empty_0: -7899023615564959475
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
